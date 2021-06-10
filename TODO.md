@@ -7,3 +7,5 @@
   * [ ] Wrap filter with options builder
   * [ ] Wrap normalisations
   * [ ] SummarizedExperiment name thing
+- [ ] Generate plots all in one big html file
+  * [ ] D3.js for visualisation

@@ -5,7 +5,7 @@
 createInst = c()
 
 # Run a build
-function runBuild(build) {
+runBuild <- function(build) {
   accumulator = NULL
   for (x in build) {
     accumulator = call(x, accumulator)
@@ -13,6 +13,6 @@ function runBuild(build) {
 }
 
 # Run a vector of builds - this is just a convenience wrapper around lapply
-function runBuilds(builds) {
+runBuilds <- function(builds) {
   lapply(builds, runBuild)
 }

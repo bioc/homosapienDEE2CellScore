@@ -7,7 +7,9 @@ createInst = c()
 # Run a build
 function runBuild(build) {
   accumulator = NULL
-  
+  for (x in build) {
+    accumulator = call(x, accumulator)
+  }
 }
 
 # Run a vector of builds - this is just a convenience wrapper around lapply

@@ -2,3 +2,4 @@
 
 importFrom(BiocGenerics,cbind)
 importFrom(getDEE2,getDEE2)
+importFrom(getDEE2,getDEE2Metadata)

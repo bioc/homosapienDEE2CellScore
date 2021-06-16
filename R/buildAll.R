@@ -17,7 +17,8 @@ runBuilds <- function(builds) {
 
 buildGetData <- function(species, accessions, out_name) {
   ret <- function(accumulator) {
-    accumulator[out_name] <- getDEE2::getDEE2(species, accessions)
+    #accumulator[out_name] <- getDEE2::getDEE2(species, accessions)
+    accumulator[out_name] <- lapply(accessions, function(y) { getDEE2::getDEE2(species, y) })
   }
   return(ret)
 }

@@ -22,6 +22,7 @@ buildGetData <- function(species, accessions, out_name) {
   return(ret)
 }
 
+cols <- read.csv(system.file("inst", "hsapiens_colData.csv", package="homosapienDEE2CellScore"))
 # A vector of the builds that create the `inst` directory are here:
-createInst = c(buildGetData("hsapiens", c(), "gene_data"))
+createInst = c(buildGetData("hsapiens", cols$SRR_accession, "gene_data"))
 

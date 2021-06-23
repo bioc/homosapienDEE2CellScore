@@ -4,10 +4,17 @@
 
 # Run a build
 runBuild <- function(build) {
-  accumulator = NULL
+  accumulators = list(NULL)
   for (x in build) {
-    accumulator = x(accumulator)
+    accumulators_new = list()
+    for (accumulator in accumulators) {
+      for (inner in x) {
+        accumulators_new = list(accumulators_new, list(inner(accumulator)))
+      }
+    }
+    accumulators <- accumulators_new
   }
+  return(accumulators)
 }
 
 # Run a vector of builds - this is just a convenience wrapper around lapply
@@ -25,7 +32,21 @@ buildGetData <- function(species, accessions, out_name, metadata=getDEE2Metadata
   return(ret)
 }
 
+buildFilterQC1 <- function() {
+  ret <- function(accumulator) {
+    accumulator$gene_data <- accumulator$gene_data[accumulator$gene_data$QC_summary == "PASS",]
+    return(accumulator)
+  }
+}
+
+buildFilterQC2 <- function() {
+  ret <- function(accumulator) {
+    accumulator$gene_data <- accumulator$gene_data[accumulator$gene_data$QC_summary != "FAIL",]
+    return(accumulator)
+  }
+}
+
 cols <- read.csv(system.file("inst", "hsapiens_colData.csv", package="homosapienDEE2CellScore"))
 # A vector of the builds that create the `inst` directory are here:
-createInst = c(buildGetData("hsapiens", as.list(cols$SRR_accession), "gene_data"))
+createInst = c(list(c(buildGetData("hsapiens", as.list(cols$SRR_accession[1:10]), "gene_data"))), list(c(buildFilterQC1(), buildFilterQC2())))
 

@@ -15,16 +15,17 @@ runBuilds <- function(builds) {
   lapply(builds, runBuild)
 }
 
-buildGetData <- function(species, accessions, out_name) {
+buildGetData <- function(species, accessions, out_name, metadata=getDEE2Metadata(species)) {
   ret <- function(accumulator) {
     #accumulator[out_name] <- getDEE2::getDEE2(species, accessions)
-    metadata <- getDEE2Metadata(species)
-    accumulator[out_name] <- lapply(accessions, function(y) { getDEE2::getDEE2(species, y, metadata=metadata) })
+    #metadata <- getDEE2Metadata(species)
+    accumulator[out_name] <- list(do.call(cbind, lapply(accessions, function(y) { getDEE2::getDEE2(species, y, metadata=metadata) })))
+    return(accumulator)
   }
   return(ret)
 }
 
 cols <- read.csv(system.file("inst", "hsapiens_colData.csv", package="homosapienDEE2CellScore"))
 # A vector of the builds that create the `inst` directory are here:
-createInst = c(buildGetData("hsapiens", cols$SRR_accession, "gene_data"))
+createInst = c(buildGetData("hsapiens", as.list(cols$SRR_accession), "gene_data"))
 

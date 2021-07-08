@@ -45,6 +45,11 @@ filtQC1 <- buildFilter(function(it) { startsWith(it$QC_summary, "PASS") }, "gene
 filtQC2 <- buildFilter(function(it) { startsWith(it$QC_summary, "PASS") | startsWith(it$QC_summary, "WARN") }, "gene_data")
 filtNoQC <- buildFilter(function(it) { it$QC_summary != "TEST" }, "gene_data")
 
+# add c(printAccumulator) to a point in createInst to see what the accumulators are there
+printAccumulator <- function(accumulator) {
+  print(accumulator)
+  accumulator
+}
 
 cols <- read.csv(system.file("inst", "hsapiens_colData.csv", package="homosapienDEE2CellScore"))
 # A list of the builds that create the `inst` directory are here:

@@ -1,4 +1,5 @@
-# A build is a vector of tasks.
+# A build is a list of bundles, a bundle is a list of tasks.
+# We accumulate the cross product of the tasks in each bundle
 # A task is a function which takes a state object and returns a state object.
 # We create tasks which are strung together to build this dataset; some are simple wrappers around external functions.
 
@@ -17,7 +18,7 @@ runBuild <- function(build) {
   return(accumulators)
 }
 
-# Run a vector of builds - this is just a convenience wrapper around lapply
+# Run a list of builds - this is just a convenience wrapper around lapply
 runBuilds <- function(builds) {
   lapply(builds, runBuild)
 }
@@ -46,6 +47,6 @@ filtNoQC <- buildFilter(function(it) { it$QC_summary != "TEST" }, "gene_data")
 
 
 cols <- read.csv(system.file("inst", "hsapiens_colData.csv", package="homosapienDEE2CellScore"))
-# A vector of the builds that create the `inst` directory are here:
+# A list of the builds that create the `inst` directory are here:
 createInst = list(c(buildGetData("hsapiens", as.list(cols$SRR_accession[285:295]), "gene_data")), (c(filtQC1, filtQC2, filtNoQC)))
 

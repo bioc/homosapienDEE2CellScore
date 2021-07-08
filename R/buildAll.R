@@ -9,7 +9,7 @@ runBuild <- function(build) {
     accumulators_new = list()
     for (accumulator in accumulators) {
       for (inner in x) {
-        accumulators_new = list(accumulators_new, list(inner(accumulator)))
+        accumulators_new = c(accumulators_new, (inner(accumulator)))
       }
     }
     accumulators <- accumulators_new
@@ -24,29 +24,28 @@ runBuilds <- function(builds) {
 
 buildGetData <- function(species, accessions, out_name, metadata=getDEE2Metadata(species)) {
   ret <- function(accumulator) {
-    #accumulator[out_name] <- getDEE2::getDEE2(species, accessions)
-    #metadata <- getDEE2Metadata(species)
     accumulator[out_name] <- list(do.call(cbind, lapply(accessions, function(y) { getDEE2::getDEE2(species, y, metadata=metadata) })))
     return(accumulator)
   }
   return(ret)
 }
 
-buildFilterQC1 <- function() {
+buildFilter <- function(filt, on) {
   ret <- function(accumulator) {
-    accumulator$gene_data <- accumulator$gene_data[accumulator$gene_data$QC_summary == "PASS",]
+    m <- accumulator[,filt(accumulator)]
+
+    accumulator <- m
     return(accumulator)
   }
+  return(ret)
 }
 
-buildFilterQC2 <- function() {
-  ret <- function(accumulator) {
-    accumulator$gene_data <- accumulator$gene_data[accumulator$gene_data$QC_summary != "FAIL",]
-    return(accumulator)
-  }
-}
+filtQC1 <- buildFilter(function(it) { startsWith(it$QC_summary, "PASS") }, "gene_data")
+filtQC2 <- buildFilter(function(it) { startsWith(it$QC_summary, "PASS") | startsWith(it$QC_summary, "WARN") }, "gene_data")
+filtNoQC <- buildFilter(function(it) { it$QC_summary != "TEST" }, "gene_data")
+
 
 cols <- read.csv(system.file("inst", "hsapiens_colData.csv", package="homosapienDEE2CellScore"))
 # A vector of the builds that create the `inst` directory are here:
-createInst = c(list(c(buildGetData("hsapiens", as.list(cols$SRR_accession[1:10]), "gene_data"))), list(c(buildFilterQC1(), buildFilterQC2())))
+createInst = list(c(buildGetData("hsapiens", as.list(cols$SRR_accession[285:295]), "gene_data")), (c(filtQC1, filtQC2, filtNoQC)))
 

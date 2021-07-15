@@ -5,10 +5,12 @@
 
 # Run a build
 runBuild <- function(build) {
-  accumulators = list(NULL)
+  accumulators = list(list(tags=list("initial", "padding"), padding=list("padding2", "padding3")))
   for (x in build) {
     accumulators_new = list()
     for (accumulator in accumulators) {
+      print("Accumulator at beginning of for loop: ")
+      print(accumulator)
       for (inner in x) {
         accumulators_new = c(accumulators_new, (inner(accumulator)))
       }
@@ -23,35 +25,60 @@ runBuilds <- function(builds) {
   lapply(builds, runBuild)
 }
 
-buildGetData <- function(species, accessions, out_name, metadata=getDEE2Metadata(species)) {
+buildGetData <- function(species, accessions, out_name, metadata=getDEE2Metadata(species, quiet=TRUE)) {
   ret <- function(accumulator) {
-    accumulator[out_name] <- list(do.call(cbind, lapply(accessions, function(y) { getDEE2::getDEE2(species, y, metadata=metadata) })))
+    print("accumulator at start of getData: ")
+    print(accumulator)
+    accumulator$tags <- c(accumulator$tags, "foo")
+    accumulator[[out_name]] <- list(do.call(cbind, lapply(accessions, function(y) { getDEE2::getDEE2(species, y, metadata=metadata, quiet=TRUE) })))
+    print("Accumulator at end of getData: ")
+    print(accumulator)
     return(accumulator)
   }
   return(ret)
 }
 
-buildFilter <- function(filt, on) {
+buildFilter <- function(filt, on, tag) {
   ret <- function(accumulator) {
-    m <- accumulator[,filt(accumulator)]
+    print("accumulator as of build filter")
+    print(accumulator)
+    r <- accumulator[on]
+    print("r: ")
+    print(r)
+    m <- list(r[,filt(r)])
 
-    accumulator <- m
+    accumulator[on] <- m
+    accumulator$tag <- c(accumulator$tag, tag)
     return(accumulator)
   }
   return(ret)
 }
 
-filtQC1 <- buildFilter(function(it) { startsWith(it$QC_summary, "PASS") }, "gene_data")
-filtQC2 <- buildFilter(function(it) { startsWith(it$QC_summary, "PASS") | startsWith(it$QC_summary, "WARN") }, "gene_data")
-filtNoQC <- buildFilter(function(it) { it$QC_summary != "TEST" }, "gene_data")
+filtQC1 <- buildFilter(function(it) { startsWith(it$QC_summary, "PASS") }, "gene_data", "filter: pass")
+filtQC2 <- buildFilter(function(it) { startsWith(it$QC_summary, "PASS") | startsWith(it$QC_summary, "WARN") }, "gene_data", "filter: pass and warn")
+filtNoQC <- buildFilter(function(it) { it$QC_summary != "TEST" }, "gene_data", "filter: no filter")
 
 # add c(printAccumulator) to a point in createInst to see what the accumulators are there
-printAccumulator <- function(accumulator) {
+mkPrintAccumulator <- function(message) {
+  foo <- function(accumulator) {
+    printAccumulator(accumulator, message=message)
+  }
+  foo
+}
+printAccumulator <- function(accumulator, message="") {
+  if(nchar(message) > 0) {
+    print(message)
+  }
   print(accumulator)
   accumulator
 }
 
 cols <- read.csv(system.file("inst", "hsapiens_colData.csv", package="homosapienDEE2CellScore"))
 # A list of the builds that create the `inst` directory are here:
-createInst = list(c(buildGetData("hsapiens", as.list(cols$SRR_accession[285:295]), "gene_data")), (c(filtQC1, filtQC2, filtNoQC)))
+createInst = list(
+  c(mkPrintAccumulator(message="Initial accumulator:")),
+  c(buildGetData("hsapiens", as.list(cols$SRR_accession[285:295]), "gene_data")),
+  c(mkPrintAccumulator(message="Accumulator after buildGetData:")),
+  (c(filtQC1, filtQC2, filtNoQC)),
+  c(mkPrintAccumulator(message="Final accumulator:")))
 

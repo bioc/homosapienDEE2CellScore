@@ -82,3 +82,13 @@ createInst = list(
   (c(filtQC1, filtQC2, filtNoQC)),
   c(mkPrintAccumulator(message="Final accumulator:")))
 
+doIt <- function() {
+  species <- "hsapiens"
+  accessions <- as.list(cols$SRR_accession[285:295])
+  metadata <- getDEE2Metadata(species, quiet=TRUE)
+  in_data <- do.call(cbind, lapply(accessions, function(y) { getDEE2::getDEE2(species, y, metadata=metadata, quiet=TRUE) }))
+  #print(in_data)
+  qc_pass <- in_data[, startsWith(in_data$QC_summary, "PASS")]
+  qc_warn <- in_data[, startsWith(in_data$QC_summary, "PASS") | startsWith(in_data$QC_summary, "WARN")]
+  list(qc_pass=qc_pass, qc_warn=qc_warn)
+}

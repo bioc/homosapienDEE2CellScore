@@ -82,7 +82,16 @@ createInst = list(
   (c(filtQC1, filtQC2, filtNoQC)),
   c(mkPrintAccumulator(message="Final accumulator:")))
 
-doIt <- function() {
+#' buildData builds the data included in this package
+#'
+#' This function generates the data set for this package.
+#'
+#' @export
+#' @import SummarizedExperiment
+#' @importFrom getDEE2 getDEE2
+#' @importFrom getDEE2 getDEE2Metadata
+
+buildData <- function() {
   species <- "hsapiens"
   accessions <- as.list(cols$SRR_accession[285:295])
   metadata <- getDEE2Metadata(species, quiet=TRUE)

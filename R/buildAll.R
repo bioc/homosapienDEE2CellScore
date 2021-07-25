@@ -91,13 +91,11 @@ createInst = list(
 #' @importFrom getDEE2 getDEE2
 #' @importFrom getDEE2 getDEE2Metadata
 
-buildData <- function() {
-  species <- "hsapiens"
+buildData <- function(species="hsapiens", name="homosapienDEE2Data.rds", base=getwd(), quiet=TRUE, metadata=getDEE2Metadata(species, quiet=quiet)) {
   accessions <- as.list(cols$SRR_accession[285:295])
-  metadata <- getDEE2Metadata(species, quiet=TRUE)
-  in_data <- do.call(cbind, lapply(accessions, function(y) { getDEE2::getDEE2(species, y, metadata=metadata, quiet=TRUE) }))
+  in_data <- do.call(cbind, lapply(accessions, function(y) { getDEE2::getDEE2(species, y, metadata=metadata, quiet=quiet) }))
   #print(in_data)
   qc_pass <- in_data[, startsWith(in_data$QC_summary, "PASS")]
   qc_warn <- in_data[, startsWith(in_data$QC_summary, "PASS") | startsWith(in_data$QC_summary, "WARN")]
-  list(qc_pass=qc_pass, qc_warn=qc_warn)
+  out <- list(qc_pass=qc_pass, qc_warn=qc_warn)
 }

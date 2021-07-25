@@ -98,4 +98,5 @@ buildData <- function(species="hsapiens", name="homosapienDEE2Data.rds", base=ge
   qc_pass <- in_data[, startsWith(in_data$QC_summary, "PASS")]
   qc_warn <- in_data[, startsWith(in_data$QC_summary, "PASS") | startsWith(in_data$QC_summary, "WARN")]
   out <- list(qc_pass=qc_pass, qc_warn=qc_warn)
+  saveRDS(out, file=paste(base, name, sep="/"))
 }

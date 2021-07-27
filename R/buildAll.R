@@ -95,7 +95,7 @@ createInst = list(
 #' @importFrom DESeq2 DESeqDataSetFromMatrix
 #' @importFrom BiocGenerics estimateSizeFactors counts
 
-buildData <- function(species="hsapiens", name="homosapienDEE2Data.rds", base=getwd(), quiet=TRUE, metadata=getDEE2Metadata(species, quiet=quiet), counts.cutoff = 10, accessions=as.list(cols$SRR_accession[285:295])) {
+buildData <- function(species="hsapiens", name="homosapienDEE2Data.rds", base=getwd(), quiet=TRUE, metadata=getDEE2Metadata(species, quiet=quiet), counts.cutoff = 10, accessions=as.list(cols$SRR_accession)) {
   in_data <- do.call(cbind, lapply(accessions, function(y) { getDEE2::getDEE2(species, y, metadata=metadata, quiet=quiet) }))
   #print(in_data)
   qc_pass <- in_data[, startsWith(in_data$QC_summary, "PASS")]

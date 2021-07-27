@@ -90,13 +90,36 @@ createInst = list(
 #' @import SummarizedExperiment
 #' @importFrom getDEE2 getDEE2
 #' @importFrom getDEE2 getDEE2Metadata
+#' @importClassesFrom SummarizedExperiment SummarizedExperiment
+#' @importFrom SummarizedExperiment assay colData rowData
+#' @importFrom DESeq2 DESeqDataSetFromMatrix
+#' @importFrom BiocGenerics estimateSizeFactors counts
 
-buildData <- function(species="hsapiens", name="homosapienDEE2Data.rds", base=getwd(), quiet=TRUE, metadata=getDEE2Metadata(species, quiet=quiet)) {
-  accessions <- as.list(cols$SRR_accession[285:295])
+buildData <- function(species="hsapiens", name="homosapienDEE2Data.rds", base=getwd(), quiet=TRUE, metadata=getDEE2Metadata(species, quiet=quiet), counts.cutoff = 10, accessions=as.list(cols$SRR_accession[285:295])) {
   in_data <- do.call(cbind, lapply(accessions, function(y) { getDEE2::getDEE2(species, y, metadata=metadata, quiet=quiet) }))
   #print(in_data)
   qc_pass <- in_data[, startsWith(in_data$QC_summary, "PASS")]
   qc_warn <- in_data[, startsWith(in_data$QC_summary, "PASS") | startsWith(in_data$QC_summary, "WARN")]
-  out <- list(qc_pass=qc_pass, qc_warn=qc_warn)
+  # Now we filter
+  qc_pass_filtered <- qc_pass[rowSums(assay(qc_pass)) > counts.cutoff,]
+  qc_warn_filtered <- qc_warn[rowSums(assay(qc_warn)) > counts.cutoff,]
+  # Now normalisation
+  dds_qc_pass_filtered <- BiocGenerics::estimateSizeFactors(DESeq2::DESeqDataSetFromMatrix(
+    countData = SummarizedExperiment::assay(qc_pass_filtered, "counts"),
+    colData = SummarizedExperiment::colData(qc_pass_filtered),
+    rowData = SummarizedExperiment::rowData(qc_pass_filtered),
+    design = ~1))
+  logcounts_qc_pass_filtered <- log2(counts(dds_qc_pass_filtered, normalize=TRUE) + 1)
+  dds_qc_warn_filtered <- BiocGenerics::estimateSizeFactors(DESeq2::DESeqDataSetFromMatrix(
+    countData = SummarizedExperiment::assay(qc_warn_filtered, "counts"),
+    colData = SummarizedExperiment::colData(qc_warn_filtered),
+    rowData = SummarizedExperiment::rowData(qc_warn_filtered),
+    design = ~1))
+  logcounts_qc_warn_filtered <- log2(counts(dds_qc_warn_filtered, normalize=TRUE) + 1)
+
+  # And beginning of pca
+  pca_qc_pass_filtered <- prcomp(t(logcounts_qc_pass_filtered))
+  pca_qc_warn_filtered <- prcomp(t(logcounts_qc_warn_filtered))
+  out <- list(qc_pass_deseq2=logcounts_qc_pass_filtered, qc_pass_deseq2_pca=pca_qc_pass_filtered, qc_warn_deseq2=logcounts_qc_warn_filtered, qc_warn_deseq2_pca=pca_qc_warn_filtered)
   saveRDS(out, file=paste(base, name, sep="/"))
 }

@@ -2,6 +2,13 @@
 
 export(buildData)
 import(SummarizedExperiment)
+importClassesFrom(SummarizedExperiment,SummarizedExperiment)
 importFrom(BiocGenerics,cbind)
+importFrom(BiocGenerics,counts)
+importFrom(BiocGenerics,estimateSizeFactors)
+importFrom(DESeq2,DESeqDataSetFromMatrix)
+importFrom(SummarizedExperiment,assay)
+importFrom(SummarizedExperiment,colData)
+importFrom(SummarizedExperiment,rowData)
 importFrom(getDEE2,getDEE2)
 importFrom(getDEE2,getDEE2Metadata)

@@ -98,6 +98,7 @@ createInst = list(
 #' @param counts.cutoff Cutoff value for minimum gene expression; default is 10.
 #' @param accessions    Which gene accessions to download data for from DEE2; default is derived from `hsapiens_colData.csv` in this package. For subsets, you can see the internal `cols` objects `SRR_accession` member.
 #' @param in_data       If you have already downloaded the accession data from DEE2, you can pass it through here. Otherwise this data will be downloaded.
+#' @param dds_design    The design formula used as part of DESeq2 normalisation. Default is `~ 1`. See the documentation for `DESeq2::DESeqDataSetFromMatrix` for more details.
 #' @export
 #' @import SummarizedExperiment
 #' @importFrom getDEE2 getDEE2
@@ -107,7 +108,7 @@ createInst = list(
 #' @importFrom DESeq2 DESeqDataSetFromMatrix
 #' @importFrom BiocGenerics estimateSizeFactors counts cbind
 
-buildData <- function(species="hsapiens", name="homosapienDEE2Data.rds", base=getwd(), quiet=TRUE, metadata=getDEE2Metadata(species, quiet=quiet), counts.cutoff = 10, accessions=as.list(cols$SRR_accession), in_data = do.call(cbind, lapply(accessions, function(y) { getDEE2::getDEE2(species, y, metadata=metadata, quiet=quiet) }))) {
+buildData <- function(species="hsapiens", name="homosapienDEE2Data.rds", base=getwd(), quiet=TRUE, metadata=getDEE2Metadata(species, quiet=quiet), counts.cutoff = 10, accessions=as.list(cols$SRR_accession), in_data = do.call(cbind, lapply(accessions, function(y) { getDEE2::getDEE2(species, y, metadata=metadata, quiet=quiet) })), dds_design = ~ 1) {
   qc_pass <- in_data[, startsWith(in_data$QC_summary, "PASS")]
   qc_warn <- in_data[, startsWith(in_data$QC_summary, "PASS") | startsWith(in_data$QC_summary, "WARN")]
   # Now we filter
@@ -118,13 +119,13 @@ buildData <- function(species="hsapiens", name="homosapienDEE2Data.rds", base=ge
     countData = SummarizedExperiment::assay(qc_pass_filtered, "counts"),
     colData = SummarizedExperiment::colData(qc_pass_filtered),
     rowData = SummarizedExperiment::rowData(qc_pass_filtered),
-    design = ~1))
+    design = dds_design))
   logcounts_qc_pass_filtered <- log2(counts(dds_qc_pass_filtered, normalize=TRUE) + 1)
   dds_qc_warn_filtered <- BiocGenerics::estimateSizeFactors(DESeq2::DESeqDataSetFromMatrix(
     countData = SummarizedExperiment::assay(qc_warn_filtered, "counts"),
     colData = SummarizedExperiment::colData(qc_warn_filtered),
     rowData = SummarizedExperiment::rowData(qc_warn_filtered),
-    design = ~1))
+    design = dds_design))
   logcounts_qc_warn_filtered <- log2(counts(dds_qc_warn_filtered, normalize=TRUE) + 1)
 
   # And beginning of pca

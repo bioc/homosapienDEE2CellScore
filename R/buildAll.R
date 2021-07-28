@@ -85,7 +85,18 @@ createInst = list(
 #' buildData builds the data included in this package
 #'
 #' This function generates the data set for this package.
+#' All parameters are optional; by default the function will
+#' generate a normalised dataset based on downloading
+#' the accessions in `inst/hsapiens_colData.csv` for species "hsapiens",
+#' and save the dataset to a file called `homosapienDEE2Data.rds` in the current directory.
 #'
+#' @param species       The species to fetch data for; dafault is "hsapiens".
+#' @param name          The output file name; default is "homosapienDEE2Data.rds".
+#' @param base          The directory to output the file to; default is the current working directory.
+#' @param quiet         Whether to suppress notification output where possible; default TRUE.
+#' @param metadata      If you have already downloaded metadata for the species, you can pass it in here. Otherwise the metadata will be downloaded.
+#' @param counts.cutoff Cutoff value for minimum gene expression; default is 10.
+#' @param accessions    Which gene accessions to download data for from DEE2; default is derived from `hsapiens_colData.csv` in this package. For subsets, you can see the internal `cols` objects `SRR_accession` member.
 #' @export
 #' @import SummarizedExperiment
 #' @importFrom getDEE2 getDEE2
@@ -93,7 +104,7 @@ createInst = list(
 #' @importClassesFrom SummarizedExperiment SummarizedExperiment
 #' @importFrom SummarizedExperiment assay colData rowData
 #' @importFrom DESeq2 DESeqDataSetFromMatrix
-#' @importFrom BiocGenerics estimateSizeFactors counts
+#' @importFrom BiocGenerics estimateSizeFactors counts cbind
 
 buildData <- function(species="hsapiens", name="homosapienDEE2Data.rds", base=getwd(), quiet=TRUE, metadata=getDEE2Metadata(species, quiet=quiet), counts.cutoff = 10, accessions=as.list(cols$SRR_accession)) {
   in_data <- do.call(cbind, lapply(accessions, function(y) { getDEE2::getDEE2(species, y, metadata=metadata, quiet=quiet) }))

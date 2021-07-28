@@ -90,7 +90,7 @@ createInst = list(
 #' the accessions in `inst/hsapiens_colData.csv` for species "hsapiens",
 #' and save the dataset to a file called `homosapienDEE2Data.rds` in the current directory.
 #'
-#' @param species       The species to fetch data for; dafault is "hsapiens".
+#' @param species       The species to fetch data for; default is "hsapiens".
 #' @param name          The output file name; default is "homosapienDEE2Data.rds".
 #' @param base          The directory to output the file to; default is the current working directory.
 #' @param quiet         Whether to suppress notification output where possible; default TRUE.

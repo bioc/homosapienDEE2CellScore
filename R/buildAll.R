@@ -27,6 +27,9 @@ cols <- read.csv(system.file("inst", "hsapiens_colData.csv", package="homosapien
 #' @importFrom SummarizedExperiment assay colData rowData
 #' @importFrom DESeq2 DESeqDataSetFromMatrix
 #' @importFrom BiocGenerics estimateSizeFactors counts cbind
+#' @examples
+#' # To build the default, full dataset, and write it out to an rds file in the current directory called "homosapienDEE2Data.rds":
+#' homosapienDEE2CellScore::buildData()
 
 buildData <- function(species="hsapiens", name="homosapienDEE2Data.rds", base=getwd(), quiet=TRUE, metadata=getDEE2Metadata(species, quiet=quiet), counts.cutoff = 10, accessions=as.list(cols$SRR_accession), in_data = do.call(cbind, lapply(accessions, function(y) { getDEE2::getDEE2(species, y, metadata=metadata, quiet=quiet) })), dds_design = ~ 1) {
 

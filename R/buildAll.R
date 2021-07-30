@@ -1,86 +1,6 @@
-# A build is a list of bundles, a bundle is a list of tasks.
-# We accumulate the cross product of the tasks in each bundle
-# A task is a function which takes a state object and returns a state object.
-# We create tasks which are strung together to build this dataset; some are simple wrappers around external functions.
 
-# Run a build
-runBuild <- function(build) {
-  accumulators = list(list(tags=list("initial", "padding"), padding=list("padding2", "padding3")))
-  for (x in build) {
-    accumulators_new = list()
-    for (accumulator in accumulators) {
-      print("Accumulator at beginning of for loop: ")
-      print(accumulator)
-      for (inner in x) {
-        accumulators_new = c(accumulators_new, (inner(accumulator)))
-      }
-    }
-    accumulators <- accumulators_new
-  }
-  return(accumulators)
-}
-
-# Run a list of builds - this is just a convenience wrapper around lapply
-runBuilds <- function(builds) {
-  lapply(builds, runBuild)
-}
-
-buildGetData <- function(species, accessions, out_name, metadata=getDEE2Metadata(species, quiet=TRUE)) {
-  ret <- function(accumulator) {
-    print("accumulator at start of getData: ")
-    print(accumulator)
-    accumulator$tags <- c(accumulator$tags, "foo")
-    accumulator[[out_name]] <- list(do.call(cbind, lapply(accessions, function(y) { getDEE2::getDEE2(species, y, metadata=metadata, quiet=TRUE) })))
-    print("Accumulator at end of getData: ")
-    print(accumulator)
-    return(accumulator)
-  }
-  return(ret)
-}
-
-buildFilter <- function(filt, on, tag) {
-  ret <- function(accumulator) {
-    print("accumulator as of build filter")
-    print(accumulator)
-    r <- accumulator[on]
-    print("r: ")
-    print(r)
-    m <- list(r[,filt(r)])
-
-    accumulator[on] <- m
-    accumulator$tag <- c(accumulator$tag, tag)
-    return(accumulator)
-  }
-  return(ret)
-}
-
-filtQC1 <- buildFilter(function(it) { startsWith(it$QC_summary, "PASS") }, "gene_data", "filter: pass")
-filtQC2 <- buildFilter(function(it) { startsWith(it$QC_summary, "PASS") | startsWith(it$QC_summary, "WARN") }, "gene_data", "filter: pass and warn")
-filtNoQC <- buildFilter(function(it) { it$QC_summary != "TEST" }, "gene_data", "filter: no filter")
-
-# add c(printAccumulator) to a point in createInst to see what the accumulators are there
-mkPrintAccumulator <- function(message) {
-  foo <- function(accumulator) {
-    printAccumulator(accumulator, message=message)
-  }
-  foo
-}
-printAccumulator <- function(accumulator, message="") {
-  if(nchar(message) > 0) {
-    print(message)
-  }
-  print(accumulator)
-  accumulator
-}
-
+# hsapiens column data we are targetting; notably the accession are in cols$SRR_accession
 cols <- read.csv(system.file("inst", "hsapiens_colData.csv", package="homosapienDEE2CellScore"))
-# A list of the builds that create the `inst` directory are here:
-createInst = list(
-  c(mkPrintAccumulator(message="Initial accumulator:")),
-  c(buildGetData("hsapiens", as.list(cols$SRR_accession[285:295]), "gene_data")),
-  c(mkPrintAccumulator(message="Accumulator after buildGetData:")),
-  (c(filtQC1, filtQC2, filtNoQC)),
-  c(mkPrintAccumulator(message="Final accumulator:")))
 
 #' buildData builds the data included in this package
 #'
@@ -109,11 +29,17 @@ createInst = list(
 #' @importFrom BiocGenerics estimateSizeFactors counts cbind
 
 buildData <- function(species="hsapiens", name="homosapienDEE2Data.rds", base=getwd(), quiet=TRUE, metadata=getDEE2Metadata(species, quiet=quiet), counts.cutoff = 10, accessions=as.list(cols$SRR_accession), in_data = do.call(cbind, lapply(accessions, function(y) { getDEE2::getDEE2(species, y, metadata=metadata, quiet=quiet) })), dds_design = ~ 1) {
+
+  # All of the 'optionally overriden' data possible is calculated in the function's arguments.
+
+  # Take either the clean pass of qc data, or the data which passes and the data which has warnings, but not failures
   qc_pass <- in_data[, startsWith(in_data$QC_summary, "PASS")]
   qc_warn <- in_data[, startsWith(in_data$QC_summary, "PASS") | startsWith(in_data$QC_summary, "WARN")]
-  # Now we filter
+
+  # Now we filter based on gene activity
   qc_pass_filtered <- qc_pass[rowSums(assay(qc_pass)) > counts.cutoff,]
   qc_warn_filtered <- qc_warn[rowSums(assay(qc_warn)) > counts.cutoff,]
+
   # Now normalisation
   dds_qc_pass_filtered <- BiocGenerics::estimateSizeFactors(DESeq2::DESeqDataSetFromMatrix(
     countData = SummarizedExperiment::assay(qc_pass_filtered, "counts"),
@@ -131,6 +57,8 @@ buildData <- function(species="hsapiens", name="homosapienDEE2Data.rds", base=ge
   # And beginning of pca
   pca_qc_pass_filtered <- prcomp(t(logcounts_qc_pass_filtered))
   pca_qc_warn_filtered <- prcomp(t(logcounts_qc_warn_filtered))
+  
+  # Write results out, gathered into a named list
   out <- list(qc_pass_deseq2=logcounts_qc_pass_filtered, qc_pass_deseq2_pca=pca_qc_pass_filtered, qc_warn_deseq2=logcounts_qc_warn_filtered, qc_warn_deseq2_pca=pca_qc_warn_filtered)
   saveRDS(out, file=paste(base, name, sep="/"))
 }

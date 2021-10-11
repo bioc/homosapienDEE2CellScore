@@ -28,8 +28,12 @@ cols <- read.csv(system.file("inst", "hsapiens_colData.csv", package="homosapien
 #' @importFrom DESeq2 DESeqDataSetFromMatrix
 #' @importFrom BiocGenerics estimateSizeFactors counts cbind
 #' @examples
-#' # To build the default, full dataset, and write it out to an rds file in the current directory called "homosapienDEE2Data.rds":
-#' homosapienDEE2CellScore::buildData()
+#' # To build the default, full dataset, and write it out to several csv files:
+#' #homosapienDEE2CellScore::buildData()
+#'
+#' # To build a restricted set of data, with a cached metadata file, only running deseq2 normalisation, to "data_PASS_deseq2.csv" and "data_WARN_deseq2.csv"
+#' metadata <- getDEE2Metadata("hsapiens", quiet=TRUE)
+#' homosapienDEE2CellScore::buildData(metadata=metadata, build_deseq2=TRUE, name_prefix="data")
 
 buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name_suffix=".csv", build_deseq2=TRUE, base=getwd(), quiet=TRUE, metadata=getDEE2Metadata(species, quiet=quiet), counts.cutoff = 10, accessions=as.list(cols$SRR_accession), in_data = do.call(cbind, lapply(accessions, function(y) { getDEE2::getDEE2(species, y, metadata=metadata, quiet=quiet) })), dds_design = ~ 1) {
 

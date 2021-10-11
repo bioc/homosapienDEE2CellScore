@@ -31,8 +31,10 @@ cols <- read.csv(system.file("inst", "hsapiens_colData.csv", package="homosapien
 #' # To build the default, full dataset, and write it out to an rds file in the current directory called "homosapienDEE2Data.rds":
 #' homosapienDEE2CellScore::buildData()
 
-buildData <- function(species="hsapiens", name="homosapienDEE2Data.rds", base=getwd(), quiet=TRUE, metadata=getDEE2Metadata(species, quiet=quiet), counts.cutoff = 10, accessions=as.list(cols$SRR_accession), in_data = do.call(cbind, lapply(accessions, function(y) { getDEE2::getDEE2(species, y, metadata=metadata, quiet=quiet) })), dds_design = ~ 1) {
+buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name_suffix=".csv", build_deseq2=TRUE, base=getwd(), quiet=TRUE, metadata=getDEE2Metadata(species, quiet=quiet), counts.cutoff = 10, accessions=as.list(cols$SRR_accession), in_data = do.call(cbind, lapply(accessions, function(y) { getDEE2::getDEE2(species, y, metadata=metadata, quiet=quiet) })), dds_design = ~ 1) {
 
+  out <- list()
+  outputs <- list()
   # All of the 'optionally overriden' data possible is calculated in the function's arguments.
 
   # Take either the clean pass of qc data, or the data which passes and the data which has warnings, but not failures
@@ -43,25 +45,37 @@ buildData <- function(species="hsapiens", name="homosapienDEE2Data.rds", base=ge
   qc_pass_filtered <- qc_pass[rowSums(assay(qc_pass)) > counts.cutoff,]
   qc_warn_filtered <- qc_warn[rowSums(assay(qc_warn)) > counts.cutoff,]
 
-  # Now normalisation
-  dds_qc_pass_filtered <- BiocGenerics::estimateSizeFactors(DESeq2::DESeqDataSetFromMatrix(
-    countData = SummarizedExperiment::assay(qc_pass_filtered, "counts"),
-    colData = SummarizedExperiment::colData(qc_pass_filtered),
-    rowData = SummarizedExperiment::rowData(qc_pass_filtered),
-    design = dds_design))
-  logcounts_qc_pass_filtered <- log2(counts(dds_qc_pass_filtered, normalize=TRUE) + 1)
-  dds_qc_warn_filtered <- BiocGenerics::estimateSizeFactors(DESeq2::DESeqDataSetFromMatrix(
-    countData = SummarizedExperiment::assay(qc_warn_filtered, "counts"),
-    colData = SummarizedExperiment::colData(qc_warn_filtered),
-    rowData = SummarizedExperiment::rowData(qc_warn_filtered),
-    design = dds_design))
-  logcounts_qc_warn_filtered <- log2(counts(dds_qc_warn_filtered, normalize=TRUE) + 1)
+  if(build_deseq2) {
+    # Now normalisation
+    dds_qc_pass_filtered <- BiocGenerics::estimateSizeFactors(DESeq2::DESeqDataSetFromMatrix(
+      countData = SummarizedExperiment::assay(qc_pass_filtered, "counts"),
+      colData = SummarizedExperiment::colData(qc_pass_filtered),
+      rowData = SummarizedExperiment::rowData(qc_pass_filtered),
+      design = dds_design))
+    logcounts_qc_pass_filtered <- log2(counts(dds_qc_pass_filtered, normalize=TRUE) + 1)
+    dds_qc_warn_filtered <- BiocGenerics::estimateSizeFactors(DESeq2::DESeqDataSetFromMatrix(
+      countData = SummarizedExperiment::assay(qc_warn_filtered, "counts"),
+      colData = SummarizedExperiment::colData(qc_warn_filtered),
+      rowData = SummarizedExperiment::rowData(qc_warn_filtered),
+      design = dds_design))
+    logcounts_qc_warn_filtered <- log2(counts(dds_qc_warn_filtered, normalize=TRUE) + 1)
+    out <- c(out, list(qc_pass_deseq2=logcounts_qc_pass_filtered, qc_warn_deseq2=logcounts_qc_warn_filtered))
+    outputs <- c(outputs, list(qc_pass_deseq2=paste(name_prefix, "_PASS_deseq2", name_suffix, sep=""), qc_warn_deseq2=paste(name_prefix, "_WARN_deseq2", name_suffix, sep="")))
+  }
 
-  # And beginning of pca
-  pca_qc_pass_filtered <- prcomp(t(logcounts_qc_pass_filtered))
-  pca_qc_warn_filtered <- prcomp(t(logcounts_qc_warn_filtered))
+  ## And beginning of pca
+  ##pca_qc_pass_filtered <- prcomp(t(logcounts_qc_pass_filtered))
+  ##pca_qc_warn_filtered <- prcomp(t(logcounts_qc_warn_filtered))
   
   # Write results out, gathered into a named list
-  out <- list(qc_pass_deseq2=logcounts_qc_pass_filtered, qc_pass_deseq2_pca=pca_qc_pass_filtered, qc_warn_deseq2=logcounts_qc_warn_filtered, qc_warn_deseq2_pca=pca_qc_warn_filtered)
-  saveRDS(out, file=paste(base, name, sep="/"))
+  #out <- list(qc_pass_deseq2=logcounts_qc_pass_filtered, qc_pass_deseq2_pca=pca_qc_pass_filtered, qc_warn_deseq2=logcounts_qc_warn_filtered, qc_warn_deseq2_pca=pca_qc_warn_filtered)
+  #saveRDS(out, file=paste(base, name, sep="/"))
+  writeOutput(out, outputs=outputs)
+}
+
+# Takes a named-list of processed data plus a bunch of filenames for each named thing
+writeOutput <- function(the_data, outputs=list(dds_qc_pass_filtered="dds_qc_pass_filtered.csv", dds_qc_warn_filter="dds_qc_warn_filter.csv")) {
+  lapply(names(outputs), function(n) {
+    write.csv(the_data[[n]], file=outputs[[n]], row.names=TRUE)
+  })
 }

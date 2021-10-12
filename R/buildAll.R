@@ -21,6 +21,7 @@ cols <- read.csv(system.file("inst", "hsapiens_colData.csv", package="homosapien
 #' @param accessions    Which gene accessions to download data for from DEE2; default is derived from `hsapiens_colData.csv` in this package. For subsets, you can see the internal `cols` objects `SRR_accession` member.
 #' @param in_data       If you have already downloaded the accession data from DEE2, you can pass it through here. Otherwise this data will be downloaded.
 #' @param dds_design    The design formula used as part of DESeq2 normalisation. Default is `~ 1`. See the documentation for `DESeq2::DESeqDataSetFromMatrix` for more details.
+#' @param write_files   Write out normalised data to files. If this is false, the function will not write out the normalised data, but will only return it.
 #' @export
 #' @import SummarizedExperiment
 #' @importFrom getDEE2 getDEE2
@@ -37,7 +38,7 @@ cols <- read.csv(system.file("inst", "hsapiens_colData.csv", package="homosapien
 #' metadata <- getDEE2Metadata("hsapiens", quiet=TRUE)
 #' homosapienDEE2CellScore::buildData(metadata=metadata, accessions=as.list(cols$SRR_accession[1:10]), build_deseq2=TRUE, name_prefix="data")
 
-buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name_suffix=".csv", build_deseq2=TRUE, base=getwd(), quiet=TRUE, metadata=getDEE2Metadata(species, quiet=quiet), counts.cutoff = 10, accessions=as.list(cols$SRR_accession), in_data = do.call(cbind, lapply(accessions, function(y) { getDEE2::getDEE2(species, y, metadata=metadata, quiet=quiet) })), dds_design = ~ 1) {
+buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name_suffix=".csv", build_deseq2=TRUE, base=getwd(), quiet=TRUE, metadata=getDEE2Metadata(species, quiet=quiet), counts.cutoff = 10, accessions=as.list(cols$SRR_accession), in_data = do.call(cbind, lapply(accessions, function(y) { getDEE2::getDEE2(species, y, metadata=metadata, quiet=quiet) })), dds_design = ~ 1, write_files = TRUE) {
 
   out <- list()
   outputs <- list()
@@ -76,7 +77,10 @@ buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name
   # Write results out, gathered into a named list
   #out <- list(qc_pass_deseq2=logcounts_qc_pass_filtered, qc_pass_deseq2_pca=pca_qc_pass_filtered, qc_warn_deseq2=logcounts_qc_warn_filtered, qc_warn_deseq2_pca=pca_qc_warn_filtered)
   #saveRDS(out, file=paste(base, name, sep="/"))
-  writeOutput(out, outputs=outputs)
+  if (write_files) {
+    writeOutput(out, outputs=outputs)
+  }
+  out
 }
 
 # Takes a named-list of processed data plus a bunch of filenames for each named thing

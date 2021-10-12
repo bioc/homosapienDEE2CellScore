@@ -40,6 +40,9 @@ cols <- read.csv(system.file("inst", "hsapiens_colData.csv", package="homosapien
 #'
 #' # Process a subset of the data, but do not write it out into files
 #' processed_data <- homosapienDEE2CellScore::buildData(metadata=metadata, accessions=as.list(cols$SRR_accession[1:10]), write_files=FALSE)
+#'
+#' # Get PCA form of the deseq2 normalised data that passed quality control
+#' pca_form <- prcomp(t(processed_data$qc_pass_deseq2))
 
 buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name_suffix=".csv", build_deseq2=TRUE, base=getwd(), quiet=TRUE, metadata=getDEE2Metadata(species, quiet=quiet), counts.cutoff = 10, accessions=as.list(cols$SRR_accession), in_data = do.call(cbind, lapply(accessions, function(y) { getDEE2::getDEE2(species, y, metadata=metadata, quiet=quiet) })), dds_design = ~ 1, write_files = TRUE) {
 

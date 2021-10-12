@@ -11,7 +11,9 @@ cols <- read.csv(system.file("inst", "hsapiens_colData.csv", package="homosapien
 #' and save the dataset to a file called `homosapienDEE2Data.rds` in the current directory.
 #'
 #' @param species       The species to fetch data for; default is "hsapiens".
-#' @param name          The output file name; default is "homosapienDEE2Data.rds".
+#' @param name_prefix   The output file name prefix; default is "homosapienDEE2Data".
+#' @param name_suffix   The output file name suffix; default is ".csv"
+#' @param build_deseq2  Whether to build the deseq2 normalisation.
 #' @param base          The directory to output the file to; default is the current working directory.
 #' @param quiet         Whether to suppress notification output where possible; default TRUE.
 #' @param metadata      If you have already downloaded metadata for the species, you can pass it in here. Otherwise the metadata will be downloaded.
@@ -33,7 +35,7 @@ cols <- read.csv(system.file("inst", "hsapiens_colData.csv", package="homosapien
 #'
 #' # To build a restricted set of data, with a cached metadata file, only running deseq2 normalisation, to "data_PASS_deseq2.csv" and "data_WARN_deseq2.csv"
 #' metadata <- getDEE2Metadata("hsapiens", quiet=TRUE)
-#' homosapienDEE2CellScore::buildData(metadata=metadata, build_deseq2=TRUE, name_prefix="data")
+#' homosapienDEE2CellScore::buildData(metadata=metadata, accessions=as.list(cols$SRR_accession[1:10]), build_deseq2=TRUE, name_prefix="data")
 
 buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name_suffix=".csv", build_deseq2=TRUE, base=getwd(), quiet=TRUE, metadata=getDEE2Metadata(species, quiet=quiet), counts.cutoff = 10, accessions=as.list(cols$SRR_accession), in_data = do.call(cbind, lapply(accessions, function(y) { getDEE2::getDEE2(species, y, metadata=metadata, quiet=quiet) })), dds_design = ~ 1) {
 

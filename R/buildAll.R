@@ -76,13 +76,6 @@ buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name
     outputs <- c(outputs, list(qc_pass_deseq2=paste(name_prefix, "_PASS_deseq2", name_suffix, sep=""), qc_warn_deseq2=paste(name_prefix, "_WARN_deseq2", name_suffix, sep="")))
   }
 
-  ## And beginning of pca
-  ##pca_qc_pass_filtered <- prcomp(t(logcounts_qc_pass_filtered))
-  ##pca_qc_warn_filtered <- prcomp(t(logcounts_qc_warn_filtered))
-  
-  # Write results out, gathered into a named list
-  #out <- list(qc_pass_deseq2=logcounts_qc_pass_filtered, qc_pass_deseq2_pca=pca_qc_pass_filtered, qc_warn_deseq2=logcounts_qc_warn_filtered, qc_warn_deseq2_pca=pca_qc_warn_filtered)
-  #saveRDS(out, file=paste(base, name, sep="/"))
   if (write_files) {
     writeOutput(out, outputs=outputs)
   }

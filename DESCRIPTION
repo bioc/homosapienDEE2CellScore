@@ -3,7 +3,7 @@ Title: What the Package Does (One Line, Title Case)
 Version: 0.0.0.9000
 Authors: Justin Marsh 
 Description: What the package does (one paragraph).
-Imports: getDEE2 (>= 0.0.4)
+Imports: getDEE2 (>= 0.0.4),  Rtsne	(>= 0.15)
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
 Encoding: UTF-8

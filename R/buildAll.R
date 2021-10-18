@@ -31,6 +31,7 @@ cols <- read.csv(system.file("inst", "hsapiens_colData.csv", package="homosapien
 #' @importClassesFrom SummarizedExperiment SummarizedExperiment
 #' @importFrom SummarizedExperiment assay colData rowData
 #' @importFrom DESeq2 DESeqDataSetFromMatrix
+#' @importFrom Rtsne Rtsne
 #' @importFrom BiocGenerics estimateSizeFactors counts cbind
 #' @examples
 #' # To build the default, full dataset, and write it out to several csv files:
@@ -46,13 +47,13 @@ cols <- read.csv(system.file("inst", "hsapiens_colData.csv", package="homosapien
 #' # Get PCA form of the deseq2 normalised data that passed quality control
 #' pca_form <- prcomp(t(processed_data$qc_pass_deseq2))
 
-buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name_suffix=".csv", build_deseq2=TRUE, qc_pass = TRUE, qc_warn = TRUE, base=getwd(), quiet=TRUE, metadata=if((!build_deseq2) && (!qc_pass || !qc_warn)) { return(list()); } else { getDEE2Metadata(species, quiet=quiet) }, counts.cutoff = 10, accessions=as.list(cols$SRR_accession), in_data = if((!build_deseq2) && (!qc_pass || !qc_warn)) { return(list()); } else { do.call(cbind, lapply(accessions, function(y) { getDEE2::getDEE2(species, y, metadata=metadata, quiet=quiet) })) }, dds_design = ~ 1, write_files = TRUE) {
+buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name_suffix=".csv", build_deseq2=TRUE, build_tsne=TRUE, qc_pass = TRUE, qc_warn = TRUE, base=getwd(), quiet=TRUE, metadata=if((!build_deseq2) && (!qc_pass || !qc_warn)) { return(list()); } else { getDEE2Metadata(species, quiet=quiet) }, counts.cutoff = 10, accessions=as.list(cols$SRR_accession), in_data = if((!build_deseq2) && (!qc_pass || !qc_warn)) { return(list()); } else { do.call(cbind, lapply(accessions, function(y) { getDEE2::getDEE2(species, y, metadata=metadata, quiet=quiet) })) }, dds_design = ~ 1, write_files = TRUE) {
 
   out <- list()
   outputs <- list()
   # Check whether we are not going to do something
   if((!build_deseq2) && (!qc_pass || !qc_warn)) {
-    return(outputs);
+    return(out);
   }
   # All of the 'optionally overriden' data possible is calculated in the function's arguments.
 
@@ -85,6 +86,18 @@ buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name
       logcounts_qc_warn_filtered <- log2(counts(dds_qc_warn_filtered, normalize=TRUE) + 1)
       out <- c(out, list(qc_warn_deseq2=logcounts_qc_warn_filtered))
       outputs <- c(outputs, list(qc_warn_deseq2=paste(name_prefix, "_WARN_deseq2", name_suffix, sep="")))
+    }
+  }
+  if(build_tsne) {
+    if(qc_pass) {
+      tsne_qc_pass_filtered <- Rtsne(qc_pass_filtered)$Y
+      out <- c(out, list(qc_pass_tsne=tsne_qc_pass_filtered))
+      outputs <- c(outputs, list(qc_pass_tsne=paste(name_prefix, "_PASS_tsne", name_suffix, sep="")))
+    }
+    if(qc_warn) {
+      tsne_qc_warn_filtered <- Rtsne(qc_warn_filtered)$Y
+      out <- c(out, list(qc_warn_tsne=tsne_qc_warn_filtered))
+      outputs <- c(outputs, list(qc_warn_tsne=paste(name_prefix, "_WARN_tsne", name_suffix, sep="")))
     }
   }
 

@@ -20,7 +20,7 @@ cols <- read.csv(system.file("inst", "hsapiens_colData.csv", package="homosapien
 #' @param quiet         Whether to suppress notification output where possible; default TRUE.
 #' @param metadata      If you have already downloaded metadata for the species, you can pass it in here. Otherwise the metadata will be downloaded.
 #' @param counts.cutoff Cutoff value for minimum gene expression; default is 10.
-#' @param accessions    Which gene accessions to download data for from DEE2; default is derived from `hsapiens_colData.csv` in this package. For subsets, you can see the internal `cols` objects `SRR_accession` member.
+#' @param accessions    Which sample ids to download from DEE2 (we refer to these as accessions); default is derived from `hsapiens_colData.csv` in this package. For subsets, you can see the internal `cols` objects `SRR_accession` member.
 #' @param in_data       If you have already downloaded the accession data from DEE2, you can pass it through here. Otherwise this data will be downloaded.
 #' @param dds_design    The design formula used as part of DESeq2 normalisation. Default is `~ 1`. See the documentation for `DESeq2::DESeqDataSetFromMatrix` for more details.
 #' @param write_files   Write out normalised data to files. If this is false, the function will not write out the normalised data, but will only return it.

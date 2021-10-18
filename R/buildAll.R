@@ -13,6 +13,8 @@ cols <- read.csv(system.file("inst", "hsapiens_colData.csv", package="homosapien
 #' @param species       The species to fetch data for; default is "hsapiens".
 #' @param name_prefix   The output file name prefix; default is "homosapienDEE2Data".
 #' @param name_suffix   The output file name suffix; default is ".csv"
+#' @param qc_pass       Generate output from the input data that passed quality control
+#' @param qc_warn       Generate output from the the conbination of input data that passed quality control and input data that had warnings in quality control
 #' @param build_deseq2  Whether to build the deseq2 normalisation.
 #' @param base          The directory to output the file to; default is the current working directory.
 #' @param quiet         Whether to suppress notification output where possible; default TRUE.
@@ -44,10 +46,14 @@ cols <- read.csv(system.file("inst", "hsapiens_colData.csv", package="homosapien
 #' # Get PCA form of the deseq2 normalised data that passed quality control
 #' pca_form <- prcomp(t(processed_data$qc_pass_deseq2))
 
-buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name_suffix=".csv", build_deseq2=TRUE, base=getwd(), quiet=TRUE, metadata=getDEE2Metadata(species, quiet=quiet), counts.cutoff = 10, accessions=as.list(cols$SRR_accession), in_data = do.call(cbind, lapply(accessions, function(y) { getDEE2::getDEE2(species, y, metadata=metadata, quiet=quiet) })), dds_design = ~ 1, write_files = TRUE) {
+buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name_suffix=".csv", build_deseq2=TRUE, qc_pass = TRUE, qc_warn = TRUE, base=getwd(), quiet=TRUE, metadata=if((!build_deseq2) && (!qc_pass || !qc_warn)) { return(list()); } else { getDEE2Metadata(species, quiet=quiet) }, counts.cutoff = 10, accessions=as.list(cols$SRR_accession), in_data = if((!build_deseq2) && (!qc_pass || !qc_warn)) { return(list()); } else { do.call(cbind, lapply(accessions, function(y) { getDEE2::getDEE2(species, y, metadata=metadata, quiet=quiet) })) }, dds_design = ~ 1, write_files = TRUE) {
 
   out <- list()
   outputs <- list()
+  # Check whether we are not going to do something
+  if((!build_deseq2) && (!qc_pass || !qc_warn)) {
+    return(outputs);
+  }
   # All of the 'optionally overriden' data possible is calculated in the function's arguments.
 
   # Take either the clean pass of qc data, or the data which passes and the data which has warnings, but not failures
@@ -60,20 +66,26 @@ buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name
 
   if(build_deseq2) {
     # Now normalisation
-    dds_qc_pass_filtered <- BiocGenerics::estimateSizeFactors(DESeq2::DESeqDataSetFromMatrix(
-      countData = SummarizedExperiment::assay(qc_pass_filtered, "counts"),
-      colData = SummarizedExperiment::colData(qc_pass_filtered),
-      rowData = SummarizedExperiment::rowData(qc_pass_filtered),
-      design = dds_design))
-    logcounts_qc_pass_filtered <- log2(counts(dds_qc_pass_filtered, normalize=TRUE) + 1)
-    dds_qc_warn_filtered <- BiocGenerics::estimateSizeFactors(DESeq2::DESeqDataSetFromMatrix(
-      countData = SummarizedExperiment::assay(qc_warn_filtered, "counts"),
-      colData = SummarizedExperiment::colData(qc_warn_filtered),
-      rowData = SummarizedExperiment::rowData(qc_warn_filtered),
-      design = dds_design))
-    logcounts_qc_warn_filtered <- log2(counts(dds_qc_warn_filtered, normalize=TRUE) + 1)
-    out <- c(out, list(qc_pass_deseq2=logcounts_qc_pass_filtered, qc_warn_deseq2=logcounts_qc_warn_filtered))
-    outputs <- c(outputs, list(qc_pass_deseq2=paste(name_prefix, "_PASS_deseq2", name_suffix, sep=""), qc_warn_deseq2=paste(name_prefix, "_WARN_deseq2", name_suffix, sep="")))
+    if(qc_pass) {
+      dds_qc_pass_filtered <- BiocGenerics::estimateSizeFactors(DESeq2::DESeqDataSetFromMatrix(
+        countData = SummarizedExperiment::assay(qc_pass_filtered, "counts"),
+        colData = SummarizedExperiment::colData(qc_pass_filtered),
+        rowData = SummarizedExperiment::rowData(qc_pass_filtered),
+        design = dds_design))
+      logcounts_qc_pass_filtered <- log2(counts(dds_qc_pass_filtered, normalize=TRUE) + 1)
+      out <- c(out, list(qc_pass_deseq2=logcounts_qc_pass_filtered))
+      outputs <- c(outputs, list(qc_pass_deseq2=paste(name_prefix, "_PASS_deseq2", name_suffix, sep="")))
+    }
+    if(qc_warn) {
+      dds_qc_warn_filtered <- BiocGenerics::estimateSizeFactors(DESeq2::DESeqDataSetFromMatrix(
+        countData = SummarizedExperiment::assay(qc_warn_filtered, "counts"),
+        colData = SummarizedExperiment::colData(qc_warn_filtered),
+        rowData = SummarizedExperiment::rowData(qc_warn_filtered),
+        design = dds_design))
+      logcounts_qc_warn_filtered <- log2(counts(dds_qc_warn_filtered, normalize=TRUE) + 1)
+      out <- c(out, list(qc_warn_deseq2=logcounts_qc_warn_filtered))
+      outputs <- c(outputs, list(qc_warn_deseq2=paste(name_prefix, "_WARN_deseq2", name_suffix, sep="")))
+    }
   }
 
   if (write_files) {

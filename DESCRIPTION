@@ -1,11 +1,10 @@
 Package: homosapienDEE2CellScore
-Title: What the Package Does (One Line, Title Case)
+Title: Example Data Package for CellScore
 Version: 0.0.0.9000
 Authors: Justin Marsh 
-Description: What the package does (one paragraph).
+Description: A package that ...
 Imports: getDEE2 (>= 0.0.4),  Rtsne	(>= 0.15)
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.2

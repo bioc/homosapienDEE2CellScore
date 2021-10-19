@@ -3,7 +3,7 @@ Title: Example Data Package for CellScore
 Version: 0.0.0.9000
 Authors: Justin Marsh 
 Description: A package that ...
-Imports: getDEE2 (>= 0.0.4),  Rtsne	(>= 0.15)
+Imports: getDEE2 (>= 1.2.0),  Rtsne	(>= 0.15)
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true

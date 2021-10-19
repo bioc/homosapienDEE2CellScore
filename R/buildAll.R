@@ -90,12 +90,12 @@ buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name
   }
   if(build_tsne) {
     if(generate_qc_pass) {
-      tsne_qc_pass_filtered <- Rtsne(as.matrix(SummarizedExperiment::as.data.frame(SummarizedExperiment::assay(qc_pass_filtered, "counts"))))$Y
+      tsne_qc_pass_filtered <- Rtsne(unique(t(as.matrix(SummarizedExperiment::as.data.frame(SummarizedExperiment::assay(qc_pass_filtered, "counts"))))), check_duplicates=FALSE)$Y
       out <- c(out, list(qc_pass_tsne=tsne_qc_pass_filtered))
       outputs <- c(outputs, list(qc_pass_tsne=paste(name_prefix, "_PASS_tsne", name_suffix, sep="")))
     }
     if(generate_qc_warn) {
-      tsne_qc_warn_filtered <- Rtsne(as.matrix(SummarizedExperiment::as.data.frame(SummarizedExperiment::assay(qc_warn_filtered, "counts"))))$Y
+      tsne_qc_warn_filtered <- Rtsne(unique(t(as.matrix(SummarizedExperiment::as.data.frame(SummarizedExperiment::assay(qc_warn_filtered, "counts"))))), check_duplicates=FALSE)$Y
       out <- c(out, list(qc_warn_tsne=tsne_qc_warn_filtered))
       outputs <- c(outputs, list(qc_warn_tsne=paste(name_prefix, "_WARN_tsne", name_suffix, sep="")))
     }

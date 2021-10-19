@@ -3,7 +3,7 @@ Example packaged cell data
 
 ## Installation
 
-This package is not yet uploaded to Boiconductor; in order to install it from this git repo, first clone the repo:
+This package is not yet uploaded to Bioconductor; in order to install it from this git repo, first clone the repo:
 
 ```sh
 git clone https://github.com/flaviusb/homosapienDEE2CellScore.git

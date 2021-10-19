@@ -10,26 +10,26 @@ cols <- read.csv(system.file("inst", "hsapiens_colData.csv", package="homosapien
 #' the accessions in `inst/hsapiens_colData.csv` for species "hsapiens",
 #' and save the dataset to a file called `homosapienDEE2Data.rds` in the current directory.
 #'
-#' @param species       The species to fetch data for; default is "hsapiens".
-#' @param name_prefix   The output file name prefix; default is "homosapienDEE2Data".
-#' @param name_suffix   The output file name suffix; default is ".csv"
-#' @param qc_pass       Generate output from the input data that passed quality control
-#' @param qc_warn       Generate output from the the conbination of input data that passed quality control and input data that had warnings in quality control
-#' @param build_deseq2  Whether to build the deseq2 normalisation.
-#' @param base          The directory to output the file to; default is the current working directory.
-#' @param quiet         Whether to suppress notification output where possible; default TRUE.
-#' @param metadata      If you have already downloaded metadata for the species, you can pass it in here. Otherwise the metadata will be downloaded.
-#' @param counts.cutoff Cutoff value for minimum gene expression; default is 10.
-#' @param accessions    Which sample ids to download from DEE2 (we refer to these as accessions); default is derived from `hsapiens_colData.csv` in this package. For subsets, you can see the internal `cols` objects `SRR_accession` member.
-#' @param in_data       If you have already downloaded the accession data from DEE2, you can pass it through here. Otherwise this data will be downloaded.
-#' @param dds_design    The design formula used as part of DESeq2 normalisation. Default is `~ 1`. See the documentation for `DESeq2::DESeqDataSetFromMatrix` for more details.
-#' @param write_files   Write out normalised data to files. If this is false, the function will not write out the normalised data, but will only return it.
+#' @param species          The species to fetch data for; default is "hsapiens".
+#' @param name_prefix      The output file name prefix; default is "homosapienDEE2Data".
+#' @param name_suffix      The output file name suffix; default is ".csv"
+#' @param generate_qc_pass Generate output from the input data that passed quality control
+#' @param generate_qc_warn Generate output from the the conbination of input data that passed quality control and input data that had warnings in quality control
+#' @param build_deseq2     Whether to build the deseq2 normalisation.
+#' @param base             The directory to output the file to; default is the current working directory.
+#' @param quiet            Whether to suppress notification output where possible; default TRUE.
+#' @param metadata         If you have already downloaded metadata for the species, you can pass it in here. Otherwise the metadata will be downloaded.
+#' @param counts.cutoff    Cutoff value for minimum gene expression; default is 10.
+#' @param accessions       Which sample ids to download from DEE2 (we refer to these as accessions); default is derived from `hsapiens_colData.csv` in this package. For subsets, you can see the internal `cols` objects `SRR_accession` member.
+#' @param in_data          If you have already downloaded the accession data from DEE2, you can pass it through here. Otherwise this data will be downloaded.
+#' @param dds_design       The design formula used as part of DESeq2 normalisation. Default is `~ 1`. See the documentation for `DESeq2::DESeqDataSetFromMatrix` for more details.
+#' @param write_files      Write out normalised data to files. If this is false, the function will not write out the normalised data, but will only return it.
 #' @export
 #' @import SummarizedExperiment
 #' @importFrom getDEE2 getDEE2
 #' @importFrom getDEE2 getDEE2Metadata
 #' @importClassesFrom SummarizedExperiment SummarizedExperiment
-#' @importFrom SummarizedExperiment assay colData rowData
+#' @importFrom SummarizedExperiment assay colData rowData as.data.frame
 #' @importFrom DESeq2 DESeqDataSetFromMatrix
 #' @importFrom Rtsne Rtsne
 #' @importFrom BiocGenerics estimateSizeFactors counts cbind
@@ -47,7 +47,7 @@ cols <- read.csv(system.file("inst", "hsapiens_colData.csv", package="homosapien
 #' # Get PCA form of the deseq2 normalised data that passed quality control
 #' pca_form <- prcomp(t(processed_data$qc_pass_deseq2))
 
-buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name_suffix=".csv", build_deseq2=TRUE, build_tsne=TRUE, qc_pass = TRUE, qc_warn = TRUE, base=getwd(), quiet=TRUE, metadata=if((!build_deseq2) && (!qc_pass || !qc_warn)) { return(list()); } else { getDEE2Metadata(species, quiet=quiet) }, counts.cutoff = 10, accessions=as.list(cols$SRR_accession), in_data = if((!build_deseq2) && (!qc_pass || !qc_warn)) { return(list()); } else { do.call(cbind, lapply(accessions, function(y) { getDEE2::getDEE2(species, y, metadata=metadata, quiet=quiet) })) }, dds_design = ~ 1, write_files = TRUE) {
+buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name_suffix=".csv", build_deseq2=TRUE, build_tsne=TRUE, generate_qc_pass = TRUE, generate_qc_warn = TRUE, base=getwd(), quiet=TRUE, metadata=if((!build_deseq2) && (!qc_pass || !qc_warn)) { return(list()); } else { getDEE2Metadata(species, quiet=quiet) }, counts.cutoff = 10, accessions=as.list(cols$SRR_accession), in_data = if((!build_deseq2) && (!qc_pass || !qc_warn)) { return(list()); } else { do.call(cbind, lapply(accessions, function(y) { getDEE2::getDEE2(species, y, metadata=metadata, quiet=quiet) })) }, dds_design = ~ 1, write_files = TRUE) {
 
   out <- list()
   outputs <- list()
@@ -67,7 +67,7 @@ buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name
 
   if(build_deseq2) {
     # Now normalisation
-    if(qc_pass) {
+    if(generate_qc_pass) {
       dds_qc_pass_filtered <- BiocGenerics::estimateSizeFactors(DESeq2::DESeqDataSetFromMatrix(
         countData = SummarizedExperiment::assay(qc_pass_filtered, "counts"),
         colData = SummarizedExperiment::colData(qc_pass_filtered),
@@ -77,7 +77,7 @@ buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name
       out <- c(out, list(qc_pass_deseq2=logcounts_qc_pass_filtered))
       outputs <- c(outputs, list(qc_pass_deseq2=paste(name_prefix, "_PASS_deseq2", name_suffix, sep="")))
     }
-    if(qc_warn) {
+    if(generate_qc_warn) {
       dds_qc_warn_filtered <- BiocGenerics::estimateSizeFactors(DESeq2::DESeqDataSetFromMatrix(
         countData = SummarizedExperiment::assay(qc_warn_filtered, "counts"),
         colData = SummarizedExperiment::colData(qc_warn_filtered),
@@ -89,13 +89,13 @@ buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name
     }
   }
   if(build_tsne) {
-    if(qc_pass) {
-      tsne_qc_pass_filtered <- Rtsne(qc_pass_filtered)$Y
+    if(generate_qc_pass) {
+      tsne_qc_pass_filtered <- Rtsne(as.matrix(SummarizedExperiment::as.data.frame(SummarizedExperiment::assay(qc_pass_filtered, "counts"))))$Y
       out <- c(out, list(qc_pass_tsne=tsne_qc_pass_filtered))
       outputs <- c(outputs, list(qc_pass_tsne=paste(name_prefix, "_PASS_tsne", name_suffix, sep="")))
     }
-    if(qc_warn) {
-      tsne_qc_warn_filtered <- Rtsne(qc_warn_filtered)$Y
+    if(generate_qc_warn) {
+      tsne_qc_warn_filtered <- Rtsne(as.matrix(SummarizedExperiment::as.data.frame(SummarizedExperiment::assay(qc_warn_filtered, "counts"))))$Y
       out <- c(out, list(qc_warn_tsne=tsne_qc_warn_filtered))
       outputs <- c(outputs, list(qc_warn_tsne=paste(name_prefix, "_WARN_tsne", name_suffix, sep="")))
     }

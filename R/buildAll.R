@@ -2,6 +2,23 @@
 # hsapiens column data we are targetting; notably the accession are in cols$SRR_accession
 cols <- read.csv(system.file("inst", "hsapiens_colData.csv", package="homosapienDEE2CellScore"))
 
+#' buildRaw gets the raw data in SummarizedExperiment format
+#'
+#' This function gets the raw Data from dee2 and packages it in a SummarizedExperiment
+#'
+#' @param species          The species to fetch data for; default is "hsapiens".
+#' @param quiet            Whether to suppress notification output where possible; default TRUE.
+#' @param metadata         If you have already downloaded metadata for the species, you can pass it in here. Otherwise the metadata will be downloaded.
+#' @param accessions       Which sample ids to download from DEE2 (we refer to these as accessions); default is derived from `hsapiens_colData.csv` in this package. For subsets, you can see the internal `cols` objects `SRR_accession` member.
+#' @export
+#' @import SummarizedExperiment
+#' @importFrom getDEE2 getDEE2
+#' @importFrom getDEE2 getDEE2Metadata
+
+buildRaw <- function(species="hsapiens", accessions=as.list(cols$SRR_accession), quiet=TRUE, metadata=getDEE2Metadata(species, quiet=quiet)) {
+  return(do.call(cbind, lapply(accessions, function(y) { getDEE2::getDEE2(species, y, metadata=metadata, quiet=quiet) })));
+}
+
 #' buildData builds the data included in this package
 #'
 #' This function generates the data set for this package.
@@ -47,7 +64,7 @@ cols <- read.csv(system.file("inst", "hsapiens_colData.csv", package="homosapien
 #' # Get PCA form of the deseq2 normalised data that passed quality control
 #' pca_form <- prcomp(t(processed_data$qc_pass_deseq2))
 
-buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name_suffix=".csv", build_deseq2=TRUE, build_tsne=TRUE, generate_qc_pass = TRUE, generate_qc_warn = TRUE, base=getwd(), quiet=TRUE, metadata=if((!build_deseq2) && (!qc_pass || !qc_warn)) { return(list()); } else { getDEE2Metadata(species, quiet=quiet) }, counts.cutoff = 10, accessions=as.list(cols$SRR_accession), in_data = if((!build_deseq2) && (!qc_pass || !qc_warn)) { return(list()); } else { do.call(cbind, lapply(accessions, function(y) { getDEE2::getDEE2(species, y, metadata=metadata, quiet=quiet) })) }, dds_design = ~ 1, write_files = TRUE) {
+buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name_suffix=".csv", build_deseq2=TRUE, build_tsne=TRUE, generate_qc_pass = TRUE, generate_qc_warn = TRUE, base=getwd(), quiet=TRUE, metadata=if((!build_deseq2) && (!qc_pass || !qc_warn)) { return(list()); } else { getDEE2Metadata(species, quiet=quiet) }, counts.cutoff = 10, accessions=as.list(cols$SRR_accession), in_data = if((!build_deseq2) && (!qc_pass || !qc_warn)) { return(list()); } else { buildRaw(species=species, accessions=accessions, quiet=quiet, metadata=metadata) }, dds_design = ~ 1, write_files = TRUE) {
 
   out <- list()
   outputs <- list()

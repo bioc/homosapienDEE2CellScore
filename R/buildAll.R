@@ -130,3 +130,41 @@ writeOutput <- function(the_data, outputs=list(dds_qc_pass_filtered="dds_qc_pass
     write.csv(the_data[[n]], file=outputs[[n]], row.names=TRUE)
   })
 }
+
+#' srx_agg_se is a version of srx_agg that works on SummarizedExperiments
+#'
+#' This function aggregates runs that represent the same SRA experiment, and reorganises
+#' the coldata in the SummarizedExperiment to to be grouped by SRA experiment in order to
+#' preserve necessary SummarizedExperiment internal invariants.
+#'
+#' @param x          A SummarizedExperiment.
+#' @param counts     What kind of count; "GeneCounts" for STAR based gene counts, "TxCounts" for kallisto transcript level counts or "Tx2Gene" for transcript counts aggregated to gene level. Default is "GeneCounts"
+#' @export
+#' @import SummarizedExperiment
+#' @importClassesFrom SummarizedExperiment SummarizedExperiment
+#' @importFrom SummarizedExperiment assay colData rowData as.data.frame
+
+srx_agg_se <- function(x,counts="GeneCounts") {
+    mds<-colData(x)
+    base<-SummarizedExperiment::assay(x, "counts")
+    n=nrow(base)
+    srx_es<-unique(mds[["SRX_accession"]])
+    SRX_assay <- vapply(X=srx_es, function(srx) {
+        srrs<-rownames(mds)[which(mds[["SRX_accession"]] %in% srx)]
+        if (length(srrs)>1) {
+            rowSums(SummarizedExperiment::assay(x, "counts")[,srrs])
+        } else {
+            SummarizedExperiment::assay(x, "counts")[,srrs]
+        }
+    } , numeric(n))
+    m<-length(srx_es)
+    SRX_cols <- sapply(X=srx_es, function(srx) {
+        srrs<-rownames(mds)[which(mds[["SRX_accession"]] %in% srx)]
+        list(SummarizedExperiment::assay(x, "counts")[,srrs])
+    })
+    SRX_coldata <- DataFrame(matrix(SRX_cols, dimnames=list(srx_es)))
+    return(SummarizedExperiment(assays=list(counts=SRX_assay),
+                         rowData=rowData(x),
+                         colData=SRX_coldata,
+                         metadata=metadata(x)))
+}

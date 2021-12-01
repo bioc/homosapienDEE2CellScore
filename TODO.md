@@ -1,12 +1,13 @@
 # Task list
 
 
-- [X] Write runBuild/runBuilds functions
-- [X] Get cross product of tasks without having to wrap the task items so much
-- [ ] Create simple Task builders for getDEE2, a filter, a normalisation, and packing into SummarizedExperiment
-  * [X] Wrap getDEE2 with location builder
-  * [X] Write filter tasks
-  * [ ] Wrap normalisations
-  * [ ] SummarizedExperiment name thing
-- [ ] Generate plots all in one big html file
-  * [ ] D3.js for visualisation
+- [X] version of `srx_agg` that works on SummarizedExperiment
+- [ ] helpers to roundtrip SummarizedExperiment through csv
+- [ ] rankN normalisation
+- [ ] Test data
+- [ ] Upload to figshare
+- [ ] Helpers for ExperimentHub
+- [ ] ExperimentHub/Bioconductor linter check
+  - [ ] Add things that are missing
+- [ ] Upload to ExperimentHub
+- [ ] Upload to Bioconductor

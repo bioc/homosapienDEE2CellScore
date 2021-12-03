@@ -131,6 +131,20 @@ writeOutput <- function(the_data, outputs=list(dds_qc_pass_filtered="dds_qc_pass
   })
 }
 
+writeOutSE <- function(
+                       the_summarized_experiment, filename_base="SE_out", filename_ext=".csv", filenames=list(
+                       metadata=paste(filename_base, "_metadata", filename_ext,sep=""),
+                       assay_counts=paste(filename_base, "_assay_counts", filename_ext,sep=""),
+                       colData=paste(filename_base, "_colData", filename_ext,sep=""),
+                       rowData=paste(filename_base, "_rowData", filename_ext,sep=""))
+                      ) {
+  the_metadata<-metadata(the_summarized_experiment)
+  the_assay_counts<-assay(the_summarized_experiment, "counts")
+  the_colData<-colData(the_summarized_experiment)
+  the_rowData<-rowData(the_summarized_experiment)
+  writeOutput(list(metadata=the_metadata, assay_counts=the_assay_counts, colData=the_colData, rowData=the_rowData), outputs=filenames)
+}
+
 #' srx_agg_se is a version of srx_agg that works on SummarizedExperiments
 #'
 #' This function aggregates runs that represent the same SRA experiment, and reorganises

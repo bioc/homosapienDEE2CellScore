@@ -145,6 +145,18 @@ writeOutSE <- function(
   writeOutput(list(metadata=the_metadata, assay_counts=the_assay_counts, colData=the_colData, rowData=the_rowData), outputs=filenames)
 }
 
+readInSE <- function(metadata_file="SE_out_metadata.csv", assay_counts_file="SE_out_assay_counts.csv", colData_file="SE_out_colData.csv", rowData_file="SE_out_rowData.csv") {
+  metadata_in <- list() #read.csv(metadata_file, row.names=TRUE)
+  assay_counts_in <- read.csv(assay_counts_file, row.names=1)
+  colData_in <- read.csv(colData_file)
+  rowData_in <- read.csv(rowData_file, header=FALSE, row.names=1, fill=TRUE, skipNul=TRUE, blank.lines.skip=TRUE)
+  #Hack to 'fix' rowData - this doesn't actually fix things, it just breaks them in a way I don't currently care about
+  if ((length(colnames(rowData_in)) == 1) && (colnames(rowData_in)[[1]]=="V2")) {
+    rowData_in<-rowData_in[NULL]
+  }
+  return(SummarizedExperiment(assays=list(counts=assay_counts_in), rowData=rowData_in, colData=colData_in, metadata=metadata_in))
+}
+
 #' srx_agg_se is a version of srx_agg that works on SummarizedExperiments
 #'
 #' This function aggregates runs that represent the same SRA experiment, and reorganises

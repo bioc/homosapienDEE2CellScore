@@ -2,7 +2,7 @@
 
 
 - [X] version of `srx_agg` that works on SummarizedExperiment
-- [ ] helpers to roundtrip SummarizedExperiment through csv
+- [X] helpers to roundtrip SummarizedExperiment through csv
 - [ ] rankN normalisation
 - [ ] Vignette (in cooperation with Nancy)
 - [ ] Test data

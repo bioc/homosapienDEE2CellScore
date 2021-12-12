@@ -186,9 +186,10 @@ srx_agg_se <- function(x,counts="GeneCounts") {
     m<-length(srx_es)
     SRX_cols <- sapply(X=srx_es, function(srx) {
         srrs<-rownames(mds)[which(mds[["SRX_accession"]] %in% srx)]
-        list(SummarizedExperiment::assay(x, "counts")[,srrs])
+        #list(SummarizedExperiment::assay(x, "counts")[,srrs])
+        paste(srrs, collapse=" ")
     })
-    SRX_coldata <- DataFrame(matrix(SRX_cols, dimnames=list(srx_es)))
+    SRX_coldata <- DataFrame(matrix(SRX_cols, dimnames=list(srx_es, list("SRX_accessions"))))
     return(SummarizedExperiment(assays=list(counts=SRX_assay),
                          rowData=rowData(x),
                          colData=SRX_coldata,

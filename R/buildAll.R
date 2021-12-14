@@ -80,18 +80,33 @@ buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name
 
   if(build_raw) {
     if(generate_qc_pass) {
-      out <- c(out, qc_pass_raw=qc_pass)
-      outputs <- c(outputs, qc_pass_raw=paste(name_prefix, "_PASS_raw", sep=""))
+      out <- c(out, list(qc_pass_raw=qc_pass))
+      outputs <- c(outputs, list(qc_pass_raw=paste(name_prefix, "_PASS_raw", sep="")))
     }
     if(generate_qc_warn) {
-      out <- c(out, qc_warn_raw=qc_warn)
-      outputs <- c(outputs, qc_warn_raw=paste(name_prefix, "_WARN_raw", sep=""))
+      out <- c(out, list(qc_warn_raw=qc_warn))
+      outputs <- c(outputs, list(qc_warn_raw=paste(name_prefix, "_WARN_raw", sep="")))
     }
   }
 
   # Now we filter based on gene activity
   qc_pass_filtered <- qc_pass[rowSums(assay(qc_pass)) > counts.cutoff,]
   qc_warn_filtered <- qc_warn[rowSums(assay(qc_warn)) > counts.cutoff,]
+
+  # Now we aggregate into srx, instead of by srr
+  qc_pass_agg <- srx_agg_se(qc_pass_filtered)
+  qc_warn_agg <- srx_agg_se(qc_warn_filtered)
+
+  if(build_srx_agg) {
+    if(generate_qc_pass) {
+      out <- c(out, list(qc_pass_agg=qc_pass_agg))
+      outputs <- c(outputs, list(qc_pass_agg=paste(name_prefix, "_PASS_agg", sep="")))
+    }
+    if(generate_qc_warn) {
+      out <- c(out, list(qc_warn_agg=qc_warn_agg))
+      outputs <- c(outputs, list(qc_warn_agg=paste(name_prefix, "_WARN_agg", sep="")))
+    }
+  }
 
   if(build_deseq2) {
     # Now normalisation
@@ -131,7 +146,13 @@ buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name
 
   if (write_files) {
     lapply(names(out), function(n) {
-      writeOutSE(the_summarized_experiment=out[[n]], filename_base=outputs[[n]], filename_ext=name_suffix)
+      print(n)
+      # The DESEq2 library returns its own kind of object, not a SummarizedExperiment
+      if(n=="qc_pass_deseq2" || n=="qc_warn_deseq2") {
+        writeOutput(list(it=out[[n]]), output=list(it=paste(n, ".csv", sep="")))
+      } else {
+        writeOutSE(the_summarized_experiment=out[[n]], filename_base=outputs[[n]], filename_ext=name_suffix)
+      }
     })
   }
   out

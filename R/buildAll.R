@@ -64,12 +64,12 @@ buildRaw <- function(species="hsapiens", accessions=as.list(cols$SRR_accession),
 #' # Get PCA form of the deseq2 normalised data that passed quality control
 #' pca_form <- prcomp(t(processed_data$qc_pass_deseq2))
 
-buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name_suffix=".csv", build_deseq2=TRUE, build_tsne=TRUE, generate_qc_pass = TRUE, generate_qc_warn = TRUE, base=getwd(), quiet=TRUE, metadata=if((!build_deseq2) && (!generate_qc_pass || !generate_qc_warn)) { return(list()); } else { getDEE2Metadata(species, quiet=quiet) }, counts.cutoff = 10, accessions=as.list(cols$SRR_accession), in_data = if((!build_deseq2) && (!generate_qc_pass || !generate_qc_warn)) { return(list()); } else { buildRaw(species=species, accessions=accessions, quiet=quiet, metadata=metadata) }, dds_design = ~ 1, write_files = TRUE) {
+buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name_suffix=".csv", build_raw=FALSE, build_srx_agg=FALSE, build_deseq2=TRUE, build_tsne=TRUE, generate_qc_pass = TRUE, generate_qc_warn = TRUE, base=getwd(), quiet=TRUE, metadata=if(!(build_raw || build_srx_agg || build_deseq2 || build_tsne) || !(generate_qc_pass || generate_qc_warn)) { return(list()); } else { getDEE2Metadata(species, quiet=quiet) }, counts.cutoff = 10, accessions=as.list(cols$SRR_accession), in_data = if(!(build_raw || build_srx_agg || build_deseq2 || build_tsne) || !(generate_qc_pass || generate_qc_warn)) { return(list()); } else { buildRaw(species=species, accessions=accessions, quiet=quiet, metadata=metadata) }, dds_design = ~ 1, write_files = TRUE) {
 
   out <- list()
   outputs <- list()
   # Check whether we are not going to do something
-  if((!build_deseq2) && (!generate_qc_pass || !generate_qc_warn)) {
+  if(!(build_raw || build_srx_agg || build_deseq2 || build_tsne) || !(generate_qc_pass || generate_qc_warn)) {
     return(out);
   }
   # All of the 'optionally overriden' data possible is calculated in the function's arguments.
@@ -77,6 +77,17 @@ buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name
   # Take either the clean pass of qc data, or the data which passes and the data which has warnings, but not failures
   qc_pass <- in_data[, startsWith(in_data$QC_summary, "PASS")]
   qc_warn <- in_data[, startsWith(in_data$QC_summary, "PASS") | startsWith(in_data$QC_summary, "WARN")]
+
+  if(build_raw) {
+    if(generate_qc_pass) {
+      out <- c(out, qc_pass_raw=qc_pass)
+      outputs <- c(outputs, qc_pass_raw=paste(name_prefix, "_PASS_raw", sep=""))
+    }
+    if(generate_qc_warn) {
+      out <- c(out, qc_warn_raw=qc_warn)
+      outputs <- c(outputs, qc_warn_raw=paste(name_prefix, "_WARN_raw", sep=""))
+    }
+  }
 
   # Now we filter based on gene activity
   qc_pass_filtered <- qc_pass[rowSums(assay(qc_pass)) > counts.cutoff,]
@@ -92,7 +103,7 @@ buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name
         design = dds_design))
       logcounts_qc_pass_filtered <- log2(counts(dds_qc_pass_filtered, normalize=TRUE) + 1)
       out <- c(out, list(qc_pass_deseq2=logcounts_qc_pass_filtered))
-      outputs <- c(outputs, list(qc_pass_deseq2=paste(name_prefix, "_PASS_deseq2", name_suffix, sep="")))
+      outputs <- c(outputs, list(qc_pass_deseq2=paste(name_prefix, "_PASS_deseq2", sep="")))
     }
     if(generate_qc_warn) {
       dds_qc_warn_filtered <- BiocGenerics::estimateSizeFactors(DESeq2::DESeqDataSetFromMatrix(
@@ -102,24 +113,26 @@ buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name
         design = dds_design))
       logcounts_qc_warn_filtered <- log2(counts(dds_qc_warn_filtered, normalize=TRUE) + 1)
       out <- c(out, list(qc_warn_deseq2=logcounts_qc_warn_filtered))
-      outputs <- c(outputs, list(qc_warn_deseq2=paste(name_prefix, "_WARN_deseq2", name_suffix, sep="")))
+      outputs <- c(outputs, list(qc_warn_deseq2=paste(name_prefix, "_WARN_deseq2", sep="")))
     }
   }
   if(build_tsne) {
     if(generate_qc_pass) {
       tsne_qc_pass_filtered <- Rtsne(unique(t(as.matrix(SummarizedExperiment::as.data.frame(SummarizedExperiment::assay(qc_pass_filtered, "counts"))))), check_duplicates=FALSE)$Y
       out <- c(out, list(qc_pass_tsne=tsne_qc_pass_filtered))
-      outputs <- c(outputs, list(qc_pass_tsne=paste(name_prefix, "_PASS_tsne", name_suffix, sep="")))
+      outputs <- c(outputs, list(qc_pass_tsne=paste(name_prefix, "_PASS_tsne", sep="")))
     }
     if(generate_qc_warn) {
       tsne_qc_warn_filtered <- Rtsne(unique(t(as.matrix(SummarizedExperiment::as.data.frame(SummarizedExperiment::assay(qc_warn_filtered, "counts"))))), check_duplicates=FALSE)$Y
       out <- c(out, list(qc_warn_tsne=tsne_qc_warn_filtered))
-      outputs <- c(outputs, list(qc_warn_tsne=paste(name_prefix, "_WARN_tsne", name_suffix, sep="")))
+      outputs <- c(outputs, list(qc_warn_tsne=paste(name_prefix, "_WARN_tsne", sep="")))
     }
   }
 
   if (write_files) {
-    writeOutput(out, outputs=outputs)
+    lapply(names(out), function(n) {
+      writeOutSE(the_summarized_experiment=out[[n]], filename_base=outputs[[n]], filename_ext=name_suffix)
+    })
   }
   out
 }

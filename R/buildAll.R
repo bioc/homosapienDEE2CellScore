@@ -146,10 +146,9 @@ buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name
 
   if (write_files) {
     lapply(names(out), function(n) {
-      print(n)
       # The DESEq2 library returns its own kind of object, not a SummarizedExperiment
       if(n=="qc_pass_deseq2" || n=="qc_warn_deseq2") {
-        writeOutput(list(it=out[[n]]), output=list(it=paste(n, ".csv", sep="")))
+        writeOutput(list(it=out[[n]]), output=list(it=paste(name_prefix, "_", n, ".csv", sep="")))
       } else {
         writeOutSE(the_summarized_experiment=out[[n]], filename_base=outputs[[n]], filename_ext=name_suffix)
       }

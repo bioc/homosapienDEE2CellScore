@@ -117,7 +117,11 @@ buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name
         rowData = SummarizedExperiment::rowData(qc_pass_filtered),
         design = dds_design))
       logcounts_qc_pass_filtered <- log2(counts(dds_qc_pass_filtered, normalize=TRUE) + 1)
-      out <- c(out, list(qc_pass_deseq2=logcounts_qc_pass_filtered))
+      deseq2_final <- SummarizedExperiment(assays=list(counts=logcounts_qc_pass_filtered),
+                                          rowData=SummarizedExperiment::rowData(qc_pass_filtered),
+                                          colData=SummarizedExperiment::colData(qc_pass_filtered),
+                                          metadata=metadata(qc_pass_filtered))
+      out <- c(out, list(qc_pass_deseq2=deseq2_final))
       outputs <- c(outputs, list(qc_pass_deseq2=paste(name_prefix, "_PASS_deseq2", sep="")))
     }
     if(generate_qc_warn) {
@@ -127,7 +131,11 @@ buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name
         rowData = SummarizedExperiment::rowData(qc_warn_filtered),
         design = dds_design))
       logcounts_qc_warn_filtered <- log2(counts(dds_qc_warn_filtered, normalize=TRUE) + 1)
-      out <- c(out, list(qc_warn_deseq2=logcounts_qc_warn_filtered))
+      deseq2_final <- SummarizedExperiment(assays=list(counts=logcounts_qc_warn_filtered),
+                                          rowData=SummarizedExperiment::rowData(qc_warn_filtered),
+                                          colData=SummarizedExperiment::colData(qc_warn_filtered),
+                                          metadata=metadata(qc_warn_filtered))
+      out <- c(out, list(qc_warn_deseq2=deseq2_final))
       outputs <- c(outputs, list(qc_warn_deseq2=paste(name_prefix, "_WARN_deseq2", sep="")))
     }
   }
@@ -146,12 +154,7 @@ buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name
 
   if (write_files) {
     lapply(names(out), function(n) {
-      # The DESEq2 library returns its own kind of object, not a SummarizedExperiment
-      if(n=="qc_pass_deseq2" || n=="qc_warn_deseq2") {
-        writeOutput(list(it=out[[n]]), output=list(it=paste(name_prefix, "_", n, ".csv", sep="")))
-      } else {
-        writeOutSE(the_summarized_experiment=out[[n]], filename_base=outputs[[n]], filename_ext=name_suffix)
-      }
+      writeOutSE(the_summarized_experiment=out[[n]], filename_base=outputs[[n]], filename_ext=name_suffix)
     })
   }
   out

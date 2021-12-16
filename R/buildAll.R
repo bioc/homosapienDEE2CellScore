@@ -89,21 +89,21 @@ buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name
     }
   }
 
-  # Now we filter based on gene activity
-  qc_pass_filtered <- qc_pass[rowSums(assay(qc_pass)) > counts.cutoff,]
-  qc_warn_filtered <- qc_warn[rowSums(assay(qc_warn)) > counts.cutoff,]
-
   # Now we aggregate into srx, instead of by srr
-  qc_pass_agg <- srx_agg_se(qc_pass_filtered)
-  qc_warn_agg <- srx_agg_se(qc_warn_filtered)
+  qc_pass_agg <- srx_agg_se(qc_pass)
+  qc_warn_agg <- srx_agg_se(qc_warn)
+
+  # Now we filter based on gene activity
+  qc_pass_filtered <- qc_pass_agg[rowSums(assay(qc_pass_agg)) > counts.cutoff,]
+  qc_warn_filtered <- qc_warn_agg[rowSums(assay(qc_warn_agg)) > counts.cutoff,]
 
   if(build_srx_agg) {
     if(generate_qc_pass) {
-      out <- c(out, list(qc_pass_agg=qc_pass_agg))
+      out <- c(out, list(qc_pass_agg=qc_pass_filtered))
       outputs <- c(outputs, list(qc_pass_agg=paste(name_prefix, "_PASS_agg", sep="")))
     }
     if(generate_qc_warn) {
-      out <- c(out, list(qc_warn_agg=qc_warn_agg))
+      out <- c(out, list(qc_warn_agg=qc_warn_filtered))
       outputs <- c(outputs, list(qc_warn_agg=paste(name_prefix, "_WARN_agg", sep="")))
     }
   }

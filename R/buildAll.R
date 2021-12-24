@@ -1,6 +1,6 @@
 
 # hsapiens column data we are targetting; notably the accession are in cols$SRR_accession
-cols <- read.csv(system.file("inst", "hsapiens_colData_transitions_v3.5.csv", package="homosapienDEE2CellScore"))
+cols <- DataFrame(read.csv(system.file("inst", "hsapiens_colData_transitions_v3.5.csv", package="homosapienDEE2CellScore")))
 
 #' buildRaw gets the raw data in SummarizedExperiment format
 #'
@@ -74,9 +74,20 @@ buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name
   }
   # All of the 'optionally overriden' data possible is calculated in the function's arguments.
 
+  # First we add on the colData from our pre-curated package colData
+  with_colData <- in_data
+  print(paste("with_colData nrows:", nrow(with_colData), "ncols:", ncol(with_colData)))
+  colData_cols <- cols
+  rownames(colData_cols) <- colData_cols$SRR_accession
+  print(paste("colData_cols nrows:", nrow(colData_cols), "ncols:", ncol(colData_cols)))
+  colData_cols <- colData_cols[colData_cols$SRR_accession %in% rownames(colData(with_colData)),]
+  colData_cols <- colData_cols[!duplicated(colData_cols$SRR_accession),]
+  print(paste("deduplicated colData_cols nrows:", nrow(colData_cols), "ncols:", ncol(colData_cols)))
+  colData(with_colData)<-colData_cols  #cols[!duplicated(cols$SRR_accession),]
+
   # Take either the clean pass of qc data, or the data which passes and the data which has warnings, but not failures
-  qc_pass <- in_data[, startsWith(in_data$QC_summary, "PASS")]
-  qc_warn <- in_data[, startsWith(in_data$QC_summary, "PASS") | startsWith(in_data$QC_summary, "WARN")]
+  qc_pass <- with_colData[, startsWith(with_colData$QC_summary, "PASS")]
+  qc_warn <- with_colData[, startsWith(with_colData$QC_summary, "PASS") | startsWith(with_colData$QC_summary, "WARN")]
 
   if(build_raw) {
     if(generate_qc_pass) {
@@ -220,12 +231,17 @@ srx_agg_se <- function(x,counts="GeneCounts") {
         }
     } , numeric(n))
     m<-length(srx_es)
-    SRX_cols <- sapply(X=srx_es, function(srx) {
+    SRX_cols1 <- sapply(X=srx_es, function(srx) {
         srrs<-rownames(mds)[which(mds[["SRX_accession"]] %in% srx)]
         #list(SummarizedExperiment::assay(x, "counts")[,srrs])
         paste(srrs, collapse=" ")
     })
-    SRX_coldata <- DataFrame(matrix(SRX_cols, dimnames=list(srx_es, list("SRX_accessions"))))
+    SRX_col1real <- DataFrame(matrix(SRX_cols1, dimnames=list(srx_es, list("Aggregated_From"))))
+    SRX_cols2 <- cols[!duplicated(cols$SRX_accession),]
+    SRX_cols2 <- SRX_cols2[SRX_cols2$SRX_accession %in% srx_es,]
+    rownames(SRX_cols2) <- SRX_cols2$SRX_accession
+    print(paste("c1 nrow:", nrow(SRX_col1real), "c2 nrow:", nrow(SRX_cols2)))
+    SRX_coldata <- cbind(SRX_col1real, SRX_cols2)
     return(SummarizedExperiment(assays=list(counts=SRX_assay),
                          rowData=rowData(x),
                          colData=SRX_coldata,

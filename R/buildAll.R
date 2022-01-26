@@ -91,11 +91,11 @@ buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name
 
   if(build_raw) {
     if(generate_qc_pass) {
-      out <- c(out, list(qc_pass_raw=qc_pass))
+      out <- c(out, list(qc_pass_raw=addCallData(qc_pass)))
       outputs <- c(outputs, list(qc_pass_raw=paste(name_prefix, "_PASS_raw", sep="")))
     }
     if(generate_qc_warn) {
-      out <- c(out, list(qc_warn_raw=qc_warn))
+      out <- c(out, list(qc_warn_raw=addCallData(qc_warn)))
       outputs <- c(outputs, list(qc_warn_raw=paste(name_prefix, "_WARN_raw", sep="")))
     }
   }
@@ -110,11 +110,11 @@ buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name
 
   if(build_srx_agg) {
     if(generate_qc_pass) {
-      out <- c(out, list(qc_pass_agg=qc_pass_filtered))
+      out <- c(out, list(qc_pass_agg=addCallData(qc_pass_filtered)))
       outputs <- c(outputs, list(qc_pass_agg=paste(name_prefix, "_PASS_agg", sep="")))
     }
     if(generate_qc_warn) {
-      out <- c(out, list(qc_warn_agg=qc_warn_filtered))
+      out <- c(out, list(qc_warn_agg=addCallData(qc_warn_filtered)))
       outputs <- c(outputs, list(qc_warn_agg=paste(name_prefix, "_WARN_agg", sep="")))
     }
   }
@@ -132,7 +132,7 @@ buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name
                                           rowData=SummarizedExperiment::rowData(qc_pass_filtered),
                                           colData=SummarizedExperiment::colData(qc_pass_filtered),
                                           metadata=metadata(qc_pass_filtered))
-      out <- c(out, list(qc_pass_deseq2=deseq2_final))
+      out <- c(out, list(qc_pass_deseq2=addCallData(deseq2_final)))
       outputs <- c(outputs, list(qc_pass_deseq2=paste(name_prefix, "_PASS_deseq2", sep="")))
     }
     if(generate_qc_warn) {
@@ -146,10 +146,11 @@ buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name
                                           rowData=SummarizedExperiment::rowData(qc_warn_filtered),
                                           colData=SummarizedExperiment::colData(qc_warn_filtered),
                                           metadata=metadata(qc_warn_filtered))
-      out <- c(out, list(qc_warn_deseq2=deseq2_final))
+      out <- c(out, list(qc_warn_deseq2=addCallData(deseq2_final)))
       outputs <- c(outputs, list(qc_warn_deseq2=paste(name_prefix, "_WARN_deseq2", sep="")))
     }
   }
+  # We don't add calls data to the tsne form yet; I need to check whether that will work properly
   if(build_tsne) {
     if(generate_qc_pass) {
       tsne_qc_pass_filtered <- Rtsne(unique(t(as.matrix(SummarizedExperiment::as.data.frame(SummarizedExperiment::assay(qc_pass_filtered, "counts"))))), check_duplicates=FALSE)$Y
@@ -246,4 +247,11 @@ srx_agg_se <- function(x,counts="GeneCounts") {
                          rowData=rowData(x),
                          colData=SRX_coldata,
                          metadata=metadata(x)))
+}
+
+# For RNASeq data we assume any non-zero value is a call
+addCallData <- function(summarized_experiment, threshold=0) {
+  calls <- ifelse(assay(summarized_experiment, "counts") > threshold, 1, 0)
+  assay(summarized_experiment, "calls") <- calls
+  return(summarized_experiment)
 }

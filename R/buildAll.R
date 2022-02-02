@@ -64,7 +64,7 @@ buildRaw <- function(species="hsapiens", accessions=as.list(unique(cols$SRR_acce
 #' # Get PCA form of the deseq2 normalised data that passed quality control
 #' pca_form <- prcomp(t(processed_data$qc_pass_deseq2))
 
-buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name_suffix=".csv", build_raw=FALSE, build_srx_agg=FALSE, build_deseq2=TRUE, build_tsne=TRUE, generate_qc_pass = TRUE, generate_qc_warn = TRUE, base=getwd(), quiet=TRUE, metadata=if(!(build_raw || build_srx_agg || build_deseq2 || build_tsne) || !(generate_qc_pass || generate_qc_warn)) { return(list()); } else { getDEE2Metadata(species, quiet=quiet) }, counts.cutoff = 10, accessions=as.list(unique(cols$SRR_accession)), in_data = if(!(build_raw || build_srx_agg || build_deseq2 || build_tsne) || !(generate_qc_pass || generate_qc_warn)) { return(list()); } else { buildRaw(species=species, accessions=accessions, quiet=quiet, metadata=metadata) }, dds_design = ~ 1, write_files = TRUE) {
+buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name_suffix=".csv", build_raw=FALSE, build_srx_agg=FALSE, build_deseq2=TRUE, build_tsne=TRUE, build_rank=TRUE, generate_qc_pass = TRUE, generate_qc_warn = TRUE, base=getwd(), quiet=TRUE, metadata=if(!(build_raw || build_srx_agg || build_deseq2 || build_tsne || build_rank) || !(generate_qc_pass || generate_qc_warn)) { return(list()); } else { getDEE2Metadata(species, quiet=quiet) }, counts.cutoff = 10, accessions=as.list(unique(cols$SRR_accession)), in_data = if(!(build_raw || build_srx_agg || build_deseq2 || build_tsne || build_rank) || !(generate_qc_pass || generate_qc_warn)) { return(list()); } else { buildRaw(species=species, accessions=accessions, quiet=quiet, metadata=metadata) }, dds_design = ~ 1, write_files = TRUE) {
 
   out <- list()
   outputs <- list()
@@ -161,6 +161,30 @@ buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name
       tsne_qc_warn_filtered <- Rtsne(unique(t(as.matrix(SummarizedExperiment::as.data.frame(SummarizedExperiment::assay(qc_warn_filtered, "counts"))))), check_duplicates=FALSE)$Y
       out <- c(out, list(qc_warn_tsne=tsne_qc_warn_filtered))
       outputs <- c(outputs, list(qc_warn_tsne=paste(name_prefix, "_WARN_tsne", sep="")))
+    }
+  }
+  if (build_rank) {
+    if(generate_qc_pass) {
+      len <- length(assay(qc_pass_filtered, "counts"))
+      #ranks <- lapply(DataFrame(t(assay(qc_pass_filtered, "counts"))), function (x) { (order(x, decreasing=TRUE)/len)})
+      ranks <- t(as.matrix((DataFrame(lapply(DataFrame(t(assay(qc_pass_filtered, "counts")[,])), function (x) { (order(x, decreasing=TRUE)/length(x))}), row.names=colnames(assay(qc_pass_filtered, "counts")[,])))))
+      rank <- SummarizedExperiment(assays=list(counts=ranks),
+                                          rowData=SummarizedExperiment::rowData(qc_pass_filtered),
+                                          colData=SummarizedExperiment::colData(qc_pass_filtered),
+                                          metadata=metadata(qc_pass_filtered))
+      out <- c(out, list(qc_pass_rank=addCallData(rank)))
+      outputs <- c(outputs, list(qc_pass_rank=paste(name_prefix, "_PASS_rank", sep="")))
+    }
+    if(generate_qc_warn) {
+      len <- length(assay(qc_warn_filtered, "counts"))
+      #ranks <- lapply(DataFrame(t(assay(qc_warn_filtered, "counts"))), function (x) { (order(x, decreasing=TRUE)/len)})
+      ranks <- t(as.matrix((DataFrame(lapply(DataFrame(t(assay(qc_warn_filtered, "counts")[,])), function (x) { (order(x, decreasing=TRUE)/length(x))}), row.names=colnames(assay(qc_warn_filtered, "counts")[,])))))
+      rank <- SummarizedExperiment(assays=list(counts=ranks),
+                                          rowData=SummarizedExperiment::rowData(qc_warn_filtered),
+                                          colData=SummarizedExperiment::colData(qc_warn_filtered),
+                                          metadata=metadata(qc_warn_filtered))
+      out <- c(out, list(qc_warn_rank=addCallData(rank)))
+      outputs <- c(outputs, list(qc_warn_rank=paste(name_prefix, "_WARN_rank", sep="")))
     }
   }
 

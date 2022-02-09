@@ -170,12 +170,9 @@ buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name
       len <- length(assay(qc_pass_filtered, "counts"))
       #ranks <- lapply(DataFrame(t(assay(qc_pass_filtered, "counts"))), function (x) { (order(x, decreasing=TRUE)/len)})
       #ranks <- t(as.matrix((DataFrame(lapply(DataFrame(t(assay(qc_pass_filtered, "counts")[,])), function (x) { (order(x, decreasing=TRUE)/length(x))}), row.names=colnames(assay(qc_pass_filtered, "counts")[,])))))
-      ranks <- (as.matrix((DataFrame(
-                  lapply(DataFrame(
-                    (assay(qc_pass_filtered, "counts")[,])),
-                  function (x) {
-                    ((length(x) - order(x, decreasing=TRUE) + 1)/length(x))
-                  }), row.names=row.names(assay(qc_pass_filtered, "counts")[,])))))
+      nrows <- length(row.names(assay(qc_pass_filtered, "counts")))
+      #ranks <- (nrows - rowRanks(assay(qc_pass_filtered, "counts"), ties.method="average") + 1) / nrows
+      ranks <- colRanks(assay(qc_pass_filtered, "counts"), ties.method="average", preserveShape=TRUE) / nrows
       rank <- SummarizedExperiment(assays=list(counts=ranks, calls=calls_pass_template),
                                           rowData=SummarizedExperiment::rowData(qc_pass_filtered),
                                           colData=SummarizedExperiment::colData(qc_pass_filtered),
@@ -187,12 +184,9 @@ buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name
       len <- length(assay(qc_warn_filtered, "counts"))
       #ranks <- lapply(DataFrame(t(assay(qc_warn_filtered, "counts"))), function (x) { (order(x, decreasing=TRUE)/len)})
       #ranks <- t(as.matrix((DataFrame(lapply(DataFrame(t(assay(qc_warn_filtered, "counts")[,])), function (x) { (order(x, decreasing=TRUE)/length(x))}), row.names=colnames(assay(qc_warn_filtered, "counts")[,])))))
-      ranks <- (as.matrix((DataFrame(
-                  lapply(DataFrame(
-                    (assay(qc_warn_filtered, "counts")[,])),
-                  function (x) {
-                    ((length(x) - order(x, decreasing=TRUE) + 1)/length(x))
-                  }), row.names=row.names(assay(qc_warn_filtered, "counts")[,])))))
+      nrows <- length(row.names(assay(qc_warn_filtered, "counts")))
+      #ranks <- (nrows - rowRanks(assay(qc_warn_filtered, "counts"), ties.method="average") + 1) / nrows
+      ranks <- colRanks(assay(qc_warn_filtered, "counts"), ties.method="average", preserveShape=TRUE) / nrows
       rank <- SummarizedExperiment(assays=list(counts=ranks, calls=calls_warn_template),
                                           rowData=SummarizedExperiment::rowData(qc_warn_filtered),
                                           colData=SummarizedExperiment::colData(qc_warn_filtered),

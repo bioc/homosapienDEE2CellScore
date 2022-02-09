@@ -91,11 +91,11 @@ buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name
 
   if(build_raw) {
     if(generate_qc_pass) {
-      out <- c(out, list(qc_pass_raw=addCallData(qc_pass)))
+      out <- c(out, list(qc_pass_raw=.finishUp(qc_pass)))
       outputs <- c(outputs, list(qc_pass_raw=paste(name_prefix, "_PASS_raw", sep="")))
     }
     if(generate_qc_warn) {
-      out <- c(out, list(qc_warn_raw=addCallData(qc_warn)))
+      out <- c(out, list(qc_warn_raw=.finishUp(qc_warn)))
       outputs <- c(outputs, list(qc_warn_raw=paste(name_prefix, "_WARN_raw", sep="")))
     }
   }
@@ -110,11 +110,11 @@ buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name
 
   if(build_srx_agg) {
     if(generate_qc_pass) {
-      out <- c(out, list(qc_pass_agg=addCallData(qc_pass_filtered)))
+      out <- c(out, list(qc_pass_agg=.finishUp(qc_pass_filtered)))
       outputs <- c(outputs, list(qc_pass_agg=paste(name_prefix, "_PASS_agg", sep="")))
     }
     if(generate_qc_warn) {
-      out <- c(out, list(qc_warn_agg=addCallData(qc_warn_filtered)))
+      out <- c(out, list(qc_warn_agg=.finishUp(qc_warn_filtered)))
       outputs <- c(outputs, list(qc_warn_agg=paste(name_prefix, "_WARN_agg", sep="")))
     }
   }
@@ -132,7 +132,7 @@ buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name
                                           rowData=SummarizedExperiment::rowData(qc_pass_filtered),
                                           colData=SummarizedExperiment::colData(qc_pass_filtered),
                                           metadata=metadata(qc_pass_filtered))
-      out <- c(out, list(qc_pass_deseq2=addCallData(deseq2_final)))
+      out <- c(out, list(qc_pass_deseq2=.finishUp(deseq2_final)))
       outputs <- c(outputs, list(qc_pass_deseq2=paste(name_prefix, "_PASS_deseq2", sep="")))
     }
     if(generate_qc_warn) {
@@ -146,7 +146,7 @@ buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name
                                           rowData=SummarizedExperiment::rowData(qc_warn_filtered),
                                           colData=SummarizedExperiment::colData(qc_warn_filtered),
                                           metadata=metadata(qc_warn_filtered))
-      out <- c(out, list(qc_warn_deseq2=addCallData(deseq2_final)))
+      out <- c(out, list(qc_warn_deseq2=.finishUp(deseq2_final)))
       outputs <- c(outputs, list(qc_warn_deseq2=paste(name_prefix, "_WARN_deseq2", sep="")))
     }
   }
@@ -172,7 +172,7 @@ buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name
                                           rowData=SummarizedExperiment::rowData(qc_pass_filtered),
                                           colData=SummarizedExperiment::colData(qc_pass_filtered),
                                           metadata=metadata(qc_pass_filtered))
-      out <- c(out, list(qc_pass_rank=addCallData(rank)))
+      out <- c(out, list(qc_pass_rank=.finishUp(rank)))
       outputs <- c(outputs, list(qc_pass_rank=paste(name_prefix, "_PASS_rank", sep="")))
     }
     if(generate_qc_warn) {
@@ -183,7 +183,7 @@ buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name
                                           rowData=SummarizedExperiment::rowData(qc_warn_filtered),
                                           colData=SummarizedExperiment::colData(qc_warn_filtered),
                                           metadata=metadata(qc_warn_filtered))
-      out <- c(out, list(qc_warn_rank=addCallData(rank)))
+      out <- c(out, list(qc_warn_rank=.finishUp(rank)))
       outputs <- c(outputs, list(qc_warn_rank=paste(name_prefix, "_WARN_rank", sep="")))
     }
   }
@@ -278,4 +278,13 @@ addCallData <- function(summarized_experiment, threshold=0) {
   calls <- ifelse(assay(summarized_experiment, "counts") > threshold, 1, 0)
   assay(summarized_experiment, "calls") <- calls
   return(summarized_experiment)
+}
+addProbeId <- function(summarized_experiment) {
+  rd <- rowData(summarized_experiment)
+  probe_id <- rownames(rd)
+  rowData(summarized_experiment) <- cbind(rd, probe_id)
+  return(summarized_experiment)
+}
+.finishUp <- function(summarized_experiment) {
+  return(addCallData(addProbeId(summarized_experiment)))
 }

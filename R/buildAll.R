@@ -107,6 +107,8 @@ buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name
   # Now we filter based on gene activity
   qc_pass_filtered <- qc_pass_agg[rowSums(assay(qc_pass_agg)) > counts.cutoff,]
   qc_warn_filtered <- qc_warn_agg[rowSums(assay(qc_warn_agg)) > counts.cutoff,]
+  calls_pass_template <- assay(addCallData(qc_pass_filtered), "calls")
+  calls_warn_template <- assay(addCallData(qc_warn_filtered), "calls")
 
   if(build_srx_agg) {
     if(generate_qc_pass) {
@@ -174,11 +176,11 @@ buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name
                   function (x) {
                     ((length(x) - order(x, decreasing=TRUE) + 1)/length(x))
                   }), row.names=row.names(assay(qc_pass_filtered, "counts")[,])))))
-      rank <- SummarizedExperiment(assays=list(counts=ranks),
+      rank <- SummarizedExperiment(assays=list(counts=ranks, calls=calls_pass_template),
                                           rowData=SummarizedExperiment::rowData(qc_pass_filtered),
                                           colData=SummarizedExperiment::colData(qc_pass_filtered),
                                           metadata=metadata(qc_pass_filtered))
-      out <- c(out, list(qc_pass_rank=.finishUp(rank)))
+      out <- c(out, list(qc_pass_rank=addProbeId(rank)))
       outputs <- c(outputs, list(qc_pass_rank=paste(name_prefix, "_PASS_rank", sep="")))
     }
     if(generate_qc_warn) {
@@ -191,11 +193,11 @@ buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name
                   function (x) {
                     ((length(x) - order(x, decreasing=TRUE) + 1)/length(x))
                   }), row.names=row.names(assay(qc_warn_filtered, "counts")[,])))))
-      rank <- SummarizedExperiment(assays=list(counts=ranks),
+      rank <- SummarizedExperiment(assays=list(counts=ranks, calls=calls_warn_template),
                                           rowData=SummarizedExperiment::rowData(qc_warn_filtered),
                                           colData=SummarizedExperiment::colData(qc_warn_filtered),
                                           metadata=metadata(qc_warn_filtered))
-      out <- c(out, list(qc_warn_rank=.finishUp(rank)))
+      out <- c(out, list(qc_warn_rank=addProbeId(rank)))
       outputs <- c(outputs, list(qc_warn_rank=paste(name_prefix, "_WARN_rank", sep="")))
     }
   }

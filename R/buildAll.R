@@ -215,26 +215,29 @@ writeOutSE <- function(
                        the_summarized_experiment, filename_base="SE_out", filename_ext=".csv", filenames=list(
                        metadata=paste(filename_base, "_metadata", filename_ext,sep=""),
                        assay_counts=paste(filename_base, "_assay_counts", filename_ext,sep=""),
+                       assay_calls=paste(filename_base, "_assay_calls", filename_ext,sep=""),
                        colData=paste(filename_base, "_colData", filename_ext,sep=""),
                        rowData=paste(filename_base, "_rowData", filename_ext,sep=""))
                       ) {
   the_metadata<-metadata(the_summarized_experiment)
   the_assay_counts<-assay(the_summarized_experiment, "counts")
+  the_assay_calls<-assay(the_summarized_experiment, "calls")
   the_colData<-colData(the_summarized_experiment)
   the_rowData<-rowData(the_summarized_experiment)
-  writeOutput(list(metadata=the_metadata, assay_counts=the_assay_counts, colData=the_colData, rowData=the_rowData), outputs=filenames)
+  writeOutput(list(metadata=the_metadata, assay_counts=the_assay_counts, assay_calls=the_assay_calls, colData=the_colData, rowData=the_rowData), outputs=filenames)
 }
 
-readInSE <- function(metadata_file="SE_out_metadata.csv", assay_counts_file="SE_out_assay_counts.csv", colData_file="SE_out_colData.csv", rowData_file="SE_out_rowData.csv") {
+readInSE <- function(metadata_file="SE_out_metadata.csv", assay_counts_file="SE_out_assay_counts.csv", assay_calls_file="SE_out_assay_calls.csv", colData_file="SE_out_colData.csv", rowData_file="SE_out_rowData.csv") {
   metadata_in <- list() #read.csv(metadata_file, row.names=TRUE)
   assay_counts_in <- read.csv(assay_counts_file, row.names=1)
+  assay_calls_in <- read.csv(assay_calls_file, row.names=1)
   colData_in <- read.csv(colData_file)
   rowData_in <- read.csv(rowData_file, header=FALSE, row.names=1, fill=TRUE, skipNul=TRUE, blank.lines.skip=TRUE)
   #Hack to 'fix' rowData - this doesn't actually fix things, it just breaks them in a way I don't currently care about
   if ((length(colnames(rowData_in)) == 1) && (colnames(rowData_in)[[1]]=="V2")) {
     rowData_in<-rowData_in[NULL]
   }
-  return(SummarizedExperiment(assays=list(counts=assay_counts_in), rowData=rowData_in, colData=colData_in, metadata=metadata_in))
+  return(SummarizedExperiment(assays=list(counts=assay_counts_in, calls=assay_calls_in), rowData=rowData_in, colData=colData_in, metadata=metadata_in))
 }
 
 #' srx_agg_se is a version of srx_agg that works on SummarizedExperiments

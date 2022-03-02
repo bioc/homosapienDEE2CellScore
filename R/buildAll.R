@@ -293,7 +293,10 @@ addCallData <- function(summarized_experiment, threshold=0) {
 addProbeId <- function(summarized_experiment) {
   rd <- rowData(summarized_experiment)
   probe_id <- rownames(rd)
-  rowData(summarized_experiment) <- cbind(rd, probe_id)
+  feature_id <- probe_id
+  # We add both probe_id and feature_id to deal with a case where CellScore switches to using the more general feature_id.
+  # For our use though, they are identical.
+  rowData(summarized_experiment) <- cbind(rd, probe_id, feature_id)
   return(summarized_experiment)
 }
 .finishUp <- function(summarized_experiment) {

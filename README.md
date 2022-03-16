@@ -19,3 +19,17 @@ BiocManager::install()
 BiocManager::install("getDEE2")
 devtools::load_all()
 ```
+
+## Generating the packaged data from HEAD
+
+To generate the data from the version of this package on github, you can run the following in R:
+
+```R
+BiocManager::install()
+BiocManager::install("getDEE2")
+library(SummarizedExperiment)
+library(getDEE2)
+library(devtools)
+devtools::install_github(repo="flaviusb/CellScore")
+devtools::install_github(repo="flaviusb/homosapienDEE2CellScore")
+```

@@ -27,6 +27,7 @@ To generate the data from the version of this package on github, you can run the
 ```R
 BiocManager::install()
 BiocManager::install("getDEE2")
+library(Biobase)
 library(SummarizedExperiment)
 library(getDEE2)
 library(devtools)

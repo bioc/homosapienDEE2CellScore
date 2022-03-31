@@ -1,6 +1,6 @@
 
 # hsapiens column data we are targetting; notably the accession are in cols$SRR_accession
-cols <- DataFrame(read.csv(system.file("inst", "hsapiens_colData_transitions_v3.5.csv", package="homosapienDEE2CellScore")))
+cols <- DataFrame(read.csv(system.file("hsapiens_colData_transitions_v3.5.csv", package="homosapienDEE2CellScore")))
 
 #' buildRaw gets the raw data in SummarizedExperiment format
 #'

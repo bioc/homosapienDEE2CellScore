@@ -33,4 +33,6 @@ library(getDEE2)
 library(devtools)
 devtools::install_github(repo="flaviusb/CellScore")
 devtools::install_github(repo="flaviusb/homosapienDEE2CellScore")
+library(homosapienDEE2CellScore)
+buildData(build_tsne=FALSE)
 ```

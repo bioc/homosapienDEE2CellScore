@@ -227,6 +227,24 @@ writeOutSE <- function(
   writeOutput(list(metadata=the_metadata, assay_counts=the_assay_counts, assay_calls=the_assay_calls, colData=the_colData, rowData=the_rowData), outputs=filenames)
 }
 
+writeOutSEZip <- function(
+                           the_summarized_experiment, filename_base="SE_out", filename_ext=".csv", filenames=list(
+                           metadata=paste(filename_base, "_metadata", filename_ext,sep=""),
+                           assay_counts=paste(filename_base, "_assay_counts", filename_ext,sep=""),
+                           assay_calls=paste(filename_base, "_assay_calls", filename_ext,sep=""),
+                           colData=paste(filename_base, "_colData", filename_ext,sep=""),
+                           rowData=paste(filename_base, "_rowData", filename_ext,sep=""))
+                         ) {
+  # Figure out how to write to a temp directory
+  write.csv(data.frame(filenames), "manifest.csv")
+  write.csv(metadata(the_summarized_experiment), file=filenames[["metadata"]], row.names=TRUE)
+  write.csv(assay(the_summarized_experiment, "counts"), file=filenames[["assay_counts"]], row.names=TRUE)
+  write.csv(assay(the_summarized_experiment, "calls"), file=filenames[["assay_calls"]], row.names=TRUE)
+  write.csv(colData(the_summarized_experiment), file=filenames[["colData"]], row.names=TRUE)
+  write.csv(rowData(the_summarized_experiment), file=filenames[["rowData"]], row.names=TRUE)
+  zip(paste(filename_base, ".zip", sep=""), c("manifest.csv", filenames[["rowData"]], filenames[["colData"]], filenames[["assay_calls"]], filenames[["assay_counts"]], filenames[["metadata"]]))
+}
+
 readInSE <- function(metadata_file="SE_out_metadata.csv", assay_counts_file="SE_out_assay_counts.csv", assay_calls_file="SE_out_assay_calls.csv", colData_file="SE_out_colData.csv", rowData_file="SE_out_rowData.csv") {
   metadata_in <- list() #read.csv(metadata_file, row.names=TRUE)
   assay_counts_in <- read.csv(assay_counts_file, row.names=1)

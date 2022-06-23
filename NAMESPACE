@@ -2,6 +2,7 @@
 
 export(buildData)
 export(buildRaw)
+export(readInSEZip)
 export(srx_agg_se)
 export(writeOutSEZip)
 import(SummarizedExperiment)

@@ -50,6 +50,7 @@ buildRaw <- function(species="hsapiens", accessions=as.list(unique(cols$SRR_acce
 #' @importFrom DESeq2 DESeqDataSetFromMatrix
 #' @importFrom Rtsne Rtsne
 #' @importFrom BiocGenerics estimateSizeFactors counts cbind
+#' @importFrom S4Vectors DataFrame
 #' @examples
 #' # To build the default, full dataset, and write it out to several csv files:
 #' #homosapienDEE2CellScore::buildData()

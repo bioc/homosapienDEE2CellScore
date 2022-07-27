@@ -255,7 +255,7 @@ writeOutSEZip <- function(
   write.csv(assay(the_summarized_experiment, "counts"), file=filenames[["assay_counts"]], row.names=TRUE)
   write.csv(assay(the_summarized_experiment, "calls"), file=filenames[["assay_calls"]], row.names=TRUE)
   write.csv(colData(the_summarized_experiment), file=filenames[["colData"]], row.names=TRUE)
-  write.csv(rowData(the_summarized_experiment), file=filenames[["rowData"]], row.names=TRUE)
+  write.csv(data.frame(rowData(the_summarized_experiment)), file=filenames[["rowData"]], row.names=TRUE)
   zip(zip_name, c("manifest.csv", filenames[["rowData"]], filenames[["colData"]], filenames[["assay_calls"]], filenames[["assay_counts"]], filenames[["metadata"]]))
 }
 

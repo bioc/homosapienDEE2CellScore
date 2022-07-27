@@ -264,7 +264,7 @@ readInSE <- function(metadata_file="SE_out_metadata.csv", assay_counts_file="SE_
   assay_counts_in <- read.csv(assay_counts_file, row.names=1)
   assay_calls_in <- read.csv(assay_calls_file, row.names=1)
   colData_in <- read.csv(colData_file)
-  rowData_in <- read.csv(rowData_file, header=FALSE, row.names=1, fill=TRUE, skipNul=TRUE, blank.lines.skip=TRUE)
+  rowData_in <- read.csv(rowData_file, row.names=1)
   #Hack to 'fix' rowData - this doesn't actually fix things, it just breaks them in a way I don't currently care about
   if ((length(colnames(rowData_in)) == 1) && (colnames(rowData_in)[[1]]=="V2")) {
     rowData_in<-rowData_in[NULL]

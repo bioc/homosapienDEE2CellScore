@@ -263,12 +263,12 @@ readInSE <- function(metadata_file="SE_out_metadata.csv", assay_counts_file="SE_
   metadata_in <- list() #read.csv(metadata_file, row.names=TRUE)
   assay_counts_in <- read.csv(assay_counts_file, row.names=1)
   assay_calls_in <- read.csv(assay_calls_file, row.names=1)
-  colData_in <- read.csv(colData_file)
+  colData_in <- read.csv(colData_file, row.names=1)
   rowData_in <- read.csv(rowData_file, row.names=1)
   #Hack to 'fix' rowData - this doesn't actually fix things, it just breaks them in a way I don't currently care about
-  if ((length(colnames(rowData_in)) == 1) && (colnames(rowData_in)[[1]]=="V2")) {
-    rowData_in<-rowData_in[NULL]
-  }
+  #if ((length(colnames(rowData_in)) == 1) && (colnames(rowData_in)[[1]]=="V2")) {
+  #  rowData_in<-rowData_in[NULL]
+  #}
   return(SummarizedExperiment(assays=list(counts=assay_counts_in, calls=assay_calls_in), rowData=rowData_in, colData=colData_in, metadata=metadata_in))
 }
 

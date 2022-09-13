@@ -285,9 +285,16 @@ readInSE <- function(metadata_file="SE_out_metadata.csv", assay_counts_file="SE_
 #' @importFrom SummarizedExperiment assay colData rowData as.data.frame
 
 readInSEZip <- function(zip_name="SE_out.zip") {
-  unzip(zip_name)
+  x <- tempdir()
+  y <- tempfile()
+  file.copy(zip_name, y)
+  z <- getwd()
+  setwd(x)
+  unzip(y)
   file_list <- read.csv("manifest.csv")
-  return(readInSE(metadata_file=file_list[["metadata"]], assay_counts_file=file_list[["assay_counts"]], assay_calls_file=file_list[["assay_calls"]], colData_file=file_list[["colData"]], rowData_file=file_list[["rowData"]]))
+  out <- readInSE(metadata_file=file_list[["metadata"]], assay_counts_file=file_list[["assay_counts"]], assay_calls_file=file_list[["assay_calls"]], colData_file=file_list[["colData"]], rowData_file=file_list[["rowData"]])
+  setwd(z)
+  return(out)
 }
 
 #' srx_agg_se is a version of srx_agg that works on SummarizedExperiments

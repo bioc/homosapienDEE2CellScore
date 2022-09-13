@@ -1,0 +1,3 @@
+Title,Description,BiocVersion,Genome,SourceType,SourceUrl,SourceVersion,Species,TaxonomyId,Coordinate_1_based,DataProvider,Maintainer,RDataClass,DispatchClass,Location_Prefix,RDataPath,Tags
+"HomosapienDEE2_QC_PASS_Agg","Homosapien sequence data from DEE2, with only entries that PASS Quality Control, Aggregated","3.13","hsapiens","ZipFile","https://auckland.figshare.com/ndownloader/files/36638655","0.0.1","hsapiens","NA","NA","","","ZipFile","ZipFile","","","Homo sapiens"
+

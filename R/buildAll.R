@@ -388,7 +388,7 @@ addProbeId <- function(summarized_experiment) {
 #'
 #' @export
 downloadAllTheData <- function() {
-  return list(
+  return(list(
     HomosapienDEE2_QC_PASS_Agg=homosapienDEE2CellScore::readInSEZip(homosapienDEE2CellScore::HomosapienDEE2_QC_PASS_Agg()),
     HomosapienDEE2_QC_WARN_Deseq2=homosapienDEE2CellScore::readInSEZip(homosapienDEE2CellScore::HomosapienDEE2_QC_WARN_Deseq2()),
     HomosapienDEE2_QC_PASS_Deseq2=homosapienDEE2CellScore::readInSEZip(homosapienDEE2CellScore::HomosapienDEE2_QC_PASS_Deseq2()),
@@ -396,6 +396,6 @@ downloadAllTheData <- function() {
     HomosapienDEE2_QC_PASS_Raw=homosapienDEE2CellScore::readInSEZip(homosapienDEE2CellScore::HomosapienDEE2_QC_PASS_Raw()),
     HomosapienDEE2_QC_PASS_Rank=homosapienDEE2CellScore::readInSEZip(homosapienDEE2CellScore::HomosapienDEE2_QC_PASS_Rank()),
     HomosapienDEE2_QC_WARN_Rank=homosapienDEE2CellScore::readInSEZip(homosapienDEE2CellScore::HomosapienDEE2_QC_WARN_Rank()),
-    HomosapienDEE2_QC_WARN_Raw=homosapienDEE2CellScore::readInSEZip(homosapienDEE2CellScore::HomosapienDEE2_QC_WARN_Raw()),
-  )
+    HomosapienDEE2_QC_WARN_Raw=homosapienDEE2CellScore::readInSEZip(homosapienDEE2CellScore::HomosapienDEE2_QC_WARN_Raw())
+  ))
 }

@@ -54,3 +54,12 @@ library(CellScore)
 library(homosapienDEE2CellScore)
 buildData(build_tsne=FALSE)
 ```
+
+## Just getting all the data
+
+There is a helper to download the pregenerated data and format it into a tagged list of SummarizedExperiments. If you already have this library installed, you can use it like so:
+
+```R
+
+the_pregenerated_data <- downloadAllTheData()
+```

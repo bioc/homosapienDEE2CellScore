@@ -380,3 +380,22 @@ addProbeId <- function(summarized_experiment) {
 .finishUp <- function(summarized_experiment) {
   return(addCallData(addProbeId(summarized_experiment)))
 }
+
+#' downloadAllTheData in SummarizedExperiment format
+#'
+#' This is a helper function to download all of the processed data from figshare and unpack it into a tagged list of SummarizedExperiment objects.
+#'
+#'
+#' @export
+downloadAllTheData <- function() {
+  return list(
+    HomosapienDEE2_QC_PASS_Agg=homosapienDEE2CellScore::readInSEZip(homosapienDEE2CellScore::HomosapienDEE2_QC_PASS_Agg()),
+    HomosapienDEE2_QC_WARN_Deseq2=homosapienDEE2CellScore::readInSEZip(homosapienDEE2CellScore::HomosapienDEE2_QC_WARN_Deseq2()),
+    HomosapienDEE2_QC_PASS_Deseq2=homosapienDEE2CellScore::readInSEZip(homosapienDEE2CellScore::HomosapienDEE2_QC_PASS_Deseq2()),
+    HomosapienDEE2_QC_WARN_Agg=homosapienDEE2CellScore::readInSEZip(homosapienDEE2CellScore::HomosapienDEE2_QC_WARN_Agg()),
+    HomosapienDEE2_QC_PASS_Raw=homosapienDEE2CellScore::readInSEZip(homosapienDEE2CellScore::HomosapienDEE2_QC_PASS_Raw()),
+    HomosapienDEE2_QC_PASS_Rank=homosapienDEE2CellScore::readInSEZip(homosapienDEE2CellScore::HomosapienDEE2_QC_PASS_Rank()),
+    HomosapienDEE2_QC_WARN_Rank=homosapienDEE2CellScore::readInSEZip(homosapienDEE2CellScore::HomosapienDEE2_QC_WARN_Rank()),
+    HomosapienDEE2_QC_WARN_Raw=homosapienDEE2CellScore::readInSEZip(homosapienDEE2CellScore::HomosapienDEE2_QC_WARN_Raw()),
+  )
+}

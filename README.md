@@ -1,6 +1,10 @@
 # homosapienDEE2CellScore
 Example packaged cell data
 
+## Requirements
+
+This package requires Bioconductor version 3.17 or later, as that version is when the data of this data package was added to ExperimentHub. That in turn requires R version 4.3.0.
+
 ## Installation
 
 This package is not yet uploaded to Bioconductor; in order to install it from this git repo, first clone the repo:

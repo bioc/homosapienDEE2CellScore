@@ -283,6 +283,7 @@ readInSE <- function(metadata_file="SE_out_metadata.csv", assay_counts_file="SE_
 #' @import SummarizedExperiment
 #' @importClassesFrom SummarizedExperiment SummarizedExperiment
 #' @importFrom SummarizedExperiment assay colData rowData as.data.frame
+#' @importFrom utils read.csv
 
 readInSEZip <- function(zip_name="SE_out.zip") {
   x <- tempdir()
@@ -308,6 +309,7 @@ readInSEZip <- function(zip_name="SE_out.zip") {
 #' @import SummarizedExperiment
 #' @importClassesFrom SummarizedExperiment SummarizedExperiment
 #' @importFrom SummarizedExperiment assay colData rowData as.data.frame
+#' @importFrom utils read.csv
 
 readInSEFolder <- function(folder_name="SE_out/") {
   z <- getwd()

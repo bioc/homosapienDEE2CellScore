@@ -1,9 +1,10 @@
 Package: homosapienDEE2CellScore
 Title: Example Data Package for CellScore
 Version: 0.0.0.9000
-Authors: Justin Marsh 
+Author: Justin Marsh
+Maintainer: Justin Marsh <j.marsh@auckland.ac.nz>
 Description: This is a data package for normalised homosapien data downloaded from DEE2. The package both downloads, normalises, and filters the data, and provides a way to access the data from a canonical store without needing local processing. This package was built as a way to generate and store canonical test data for CellScore.
-Imports: Biobase (>= 2.39.1), Rtsne	(>= 0.15), utils(>= 3.5.0), methods (>= 3.5.0), BiocManager, AnnotationHubData, ExperimentHubData, AnnotationHub, ExperimentHub
+Imports: Biobase (>= 2.39.1), Rtsne	(>= 0.15), utils(>= 3.5.0), methods (>= 3.5.0), BiocManager, AnnotationHubData, ExperimentHubData, AnnotationHub, ExperimentHub, BiocGenerics, DESeq2, S4Vectors, SummarizedExperiment, getDEE2
 License: GPL (>= 3)
 biocViews: RNASeqData, Genome, ExperimentHub
 Encoding: UTF-8

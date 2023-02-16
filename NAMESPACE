@@ -22,3 +22,5 @@ importFrom(SummarizedExperiment,rowData)
 importFrom(getDEE2,getDEE2)
 importFrom(getDEE2,getDEE2Metadata)
 importFrom(ExperimentHub,createHubAccessors)
+importFrom(utils,read.csv)
+

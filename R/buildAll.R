@@ -53,7 +53,8 @@ buildRaw <- function(species="hsapiens", accessions=unique(cols$SRR_accession), 
 #' @importFrom DESeq2 DESeqDataSetFromMatrix
 #' @importFrom Rtsne Rtsne
 #' @importFrom BiocGenerics estimateSizeFactors counts cbind
-#' @importFrom S4Vectors DataFrame
+#' @importFrom MatrixGenerics colRanks
+#' @importFrom S4Vectors DataFrame metadata
 #' @examples
 #' # To build the default, full dataset, and write it out to several csv files:
 #' #homosapienDEE2CellScore::buildData()
@@ -63,10 +64,10 @@ buildRaw <- function(species="hsapiens", accessions=unique(cols$SRR_accession), 
 #' homosapienDEE2CellScore::buildData(metadata=metadata, accessions=as.list(unique(cols$SRR_accession)[c(1,3)]), build_deseq2=TRUE, build_tsne=FALSE, build_rank=FALSE, name_prefix="data")
 #'
 #' # Process a subset of the data, but do not write it out into files
-#' processed_data <- homosapienDEE2CellScore::buildData(metadata=metadata, accessions=as.list(cols$SRR_accession[1:10]), write_files=FALSE)
+#' processed_data <- homosapienDEE2CellScore::buildData(metadata=metadata, accessions=as.list(unique(cols$SRR_accession)[c(1,3)]), build_deseq2=TRUE, build_tsne=FALSE, write_files=FALSE)
 #'
 #' # Get PCA form of the deseq2 normalised data that passed quality control
-#' pca_form <- prcomp(t(processed_data$qc_pass_deseq2))
+#' pca_form <- prcomp(t(SummarizedExperiment::assay(processed_data$qc_pass_deseq2, "counts")))
 
 buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name_suffix=".csv", build_raw=FALSE, build_srx_agg=FALSE, build_deseq2=TRUE, build_tsne=TRUE, build_rank=TRUE, generate_qc_pass = TRUE, generate_qc_warn = TRUE, base=getwd(), quiet=TRUE, metadata=if(!(build_raw || build_srx_agg || build_deseq2 || build_tsne || build_rank) || !(generate_qc_pass || generate_qc_warn)) { return(list()); } else { getDEE2Metadata(species, quiet=quiet) }, counts.cutoff = 10, accessions=as.list(unique(cols$SRR_accession)), in_data = if(!(build_raw || build_srx_agg || build_deseq2 || build_tsne || build_rank) || !(generate_qc_pass || generate_qc_warn)) { return(list()); } else { buildRaw(species=species, accessions=accessions, quiet=quiet, metadata=metadata) }, dds_design = ~ 1, write_files = TRUE) {
 

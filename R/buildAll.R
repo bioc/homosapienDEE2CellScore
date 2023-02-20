@@ -18,7 +18,7 @@ cols <- DataFrame(read.csv(system.file("hsapiens_colData_transitions_v3.5.csv", 
 #' @importFrom getDEE2 getDEE2
 #' @importFrom getDEE2 getDEE2Metadata
 
-buildRaw <- function(species="hsapiens", accessions=as.list(unique(cols$SRR_accession)), quiet=TRUE, metadata=getDEE2Metadata(species, quiet=quiet)) {
+buildRaw <- function(species="hsapiens", accessions=unique(cols$SRR_accession), quiet=TRUE, metadata=getDEE2Metadata(species, quiet=quiet)) {
   return(do.call(cbind, lapply(accessions, function(y) { getDEE2::getDEE2(species, y, metadata=metadata, quiet=quiet) })));
 }
 
@@ -60,7 +60,7 @@ buildRaw <- function(species="hsapiens", accessions=as.list(unique(cols$SRR_acce
 #'
 #' # To build a restricted set of data, with a cached metadata file, only running deseq2 normalisation, to "data_PASS_deseq2.csv" and "data_WARN_deseq2.csv"
 #' metadata <- getDEE2::getDEE2Metadata("hsapiens", quiet=TRUE)
-#' homosapienDEE2CellScore::buildData(metadata=metadata, accessions=as.list(cols$SRR_accession[1:10]), build_deseq2=TRUE, name_prefix="data")
+#' homosapienDEE2CellScore::buildData(metadata=metadata, accessions=as.list(unique(cols$SRR_accession)[c(1,3)]), build_deseq2=TRUE, build_tsne=FALSE, build_rank=FALSE, name_prefix="data")
 #'
 #' # Process a subset of the data, but do not write it out into files
 #' processed_data <- homosapienDEE2CellScore::buildData(metadata=metadata, accessions=as.list(cols$SRR_accession[1:10]), write_files=FALSE)

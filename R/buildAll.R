@@ -56,7 +56,7 @@ buildRaw <- function(species="hsapiens", accessions=as.list(unique(cols$SRR_acce
 #' #homosapienDEE2CellScore::buildData()
 #'
 #' # To build a restricted set of data, with a cached metadata file, only running deseq2 normalisation, to "data_PASS_deseq2.csv" and "data_WARN_deseq2.csv"
-#' metadata <- getDEE2Metadata("hsapiens", quiet=TRUE)
+#' metadata <- getDEE2::getDEE2Metadata("hsapiens", quiet=TRUE)
 #' homosapienDEE2CellScore::buildData(metadata=metadata, accessions=as.list(cols$SRR_accession[1:10]), build_deseq2=TRUE, name_prefix="data")
 #'
 #' # Process a subset of the data, but do not write it out into files

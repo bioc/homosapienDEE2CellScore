@@ -5,8 +5,18 @@ Author: Justin Marsh
 Maintainer: Justin Marsh <j.marsh@auckland.ac.nz>
 Description: This is a data package for normalised homosapien data downloaded from DEE2. The package both downloads, normalises, and filters the data, and provides a way to access the data from a canonical store without needing local processing. This package was built as a way to generate and store canonical test data for CellScore.
 Imports: Rtsne	(>= 0.15), utils(>= 3.5.0), ExperimentHub, BiocGenerics, DESeq2, S4Vectors, SummarizedExperiment, getDEE2, MatrixGenerics
-Suggests: Biobase (>= 2.39.1), BiocManager, AnnotationHubData, ExperimentHubData, AnnotationHub
+Suggests: 
+    Biobase (>= 2.39.1),
+    BiocManager,
+    AnnotationHubData,
+    ExperimentHubData,
+    AnnotationHub,
+    knitr,
+    rmarkdown,
+    devtools,
+    CellScore
 License: GPL (>= 3)
 biocViews: RNASeqData, Genome, ExperimentHub
 Encoding: UTF-8
 RoxygenNote: 7.2.3
+VignetteBuilder: knitr

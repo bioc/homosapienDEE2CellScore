@@ -1,0 +1,45 @@
+---
+title: "Use the Data in this Data Package"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Use the Data in this Data Package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+#if (!requireNamespace("BiocManager", quietly = TRUE))
+#    install.packages("BiocManager")
+#install.packages("devtools")
+BiocManager::install()
+BiocManager::valid()
+BiocManager::install("getDEE2")
+BiocManager::install("DESeq2")
+library(DESeq2)
+library(Biobase)
+library(SummarizedExperiment)
+library(getDEE2)
+library(devtools)
+devtools::install_github(repo="flaviusb/CellScore")
+devtools::install_github(repo="flaviusb/homosapienDEE2CellScore")
+library(CellScore)
+library(homosapienDEE2CellScore)
+the_data<-downloadAllTheData()
+# If we want to ... with the rank normalised data that had no QC warnings
+sm <- the_data$HomosapienDEE2_QC_PASS_Rank
+test1 <- sm[, sm$category == 'test']
+standard <- sm[, sm$category == 'standard']
+sm1 <- cbind(test1, standard)
+start <- c("FIB", "FIB")
+test <- c ("iPS-FIB", "iHEP-FIB")
+target <- c("ESC", "ESC")
+cell.change <- data.frame(start, test, target)
+#group.OnOff <- OnOff(sm1, cell.change, out.put="marker.list")
+```

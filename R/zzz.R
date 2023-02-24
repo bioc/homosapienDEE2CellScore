@@ -10,7 +10,11 @@
 #' Automatically created ergonomic accessor functions
 #'
 #' Accessor functions for retrieving the data associated with this
-#' data package from ExperimentHub.
+#' data package from ExperimentHub. Each of these functions downloads the
+#' container file and then returns a path to it. This file can be
+#' rehydrated into a SummarizedExperiment by using `readInSEZip`.
+#' Usually you would want to actually use `downloadAllTheData` instead of
+#' using any of these functions.
 #'
 #' \itemize{
 #'   \item HomosapienDEE2_QC_WARN_Raw    Raw data including data that has quality control warnings
@@ -31,4 +35,6 @@
 #' @aliases HomosapienDEE2_QC_PASS_Agg
 #' @aliases HomosapienDEE2_QC_WARN_Deseq2
 #' @aliases HomosapienDEE2_QC_PASS_Deseq2
+#' @seealso readInSEZip
+#' @seealso downloadAllTheData
 NULL

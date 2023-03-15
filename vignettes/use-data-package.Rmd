@@ -15,20 +15,11 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-#if (!requireNamespace("BiocManager", quietly = TRUE))
-#    install.packages("BiocManager")
-#install.packages("devtools")
-BiocManager::install()
-BiocManager::valid()
-BiocManager::install("getDEE2")
-BiocManager::install("DESeq2")
 library(DESeq2)
 library(Biobase)
 library(SummarizedExperiment)
 library(getDEE2)
 library(devtools)
-devtools::install_github(repo="flaviusb/CellScore")
-devtools::install_github(repo="flaviusb/homosapienDEE2CellScore")
 library(CellScore)
 library(homosapienDEE2CellScore)
 the_data<-downloadAllTheData()

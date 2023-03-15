@@ -1,6 +1,6 @@
 Package: homosapienDEE2CellScore
 Title: Example Data Package for CellScore
-Version: 0.0.0.9000
+Version: 1.0.0
 Author: Justin Marsh
 Maintainer: Justin Marsh <j.marsh@auckland.ac.nz>
 Description: This is a data package for normalised homosapien data downloaded from DEE2. The package both downloads, normalises, and filters the data, and provides a way to access the data from a canonical store without needing local processing. This package was built as a way to generate and store canonical test data for CellScore.

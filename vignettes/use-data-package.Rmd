@@ -32,14 +32,12 @@ devtools::install_github(repo="flaviusb/homosapienDEE2CellScore")
 library(CellScore)
 library(homosapienDEE2CellScore)
 the_data<-downloadAllTheData()
-# If we want to ... with the rank normalised data that had no QC warnings
-sm <- the_data$HomosapienDEE2_QC_PASS_Rank
+# Here we want to analyse all of the raw data to calculate the
+# on/off score for cell transitions from fibroblast to embryonic stem cells
+sm <- the_data$HomosapienDEE2_QC_WARN_Raw
 test1 <- sm[, sm$category == 'test']
 standard <- sm[, sm$category == 'standard']
 sm1 <- cbind(test1, standard)
-start <- c("FIB", "FIB")
-test <- c ("iPS-FIB", "iHEP-FIB")
-target <- c("ESC", "ESC")
-cell.change <- data.frame(start, test, target)
-#group.OnOff <- OnOff(sm1, cell.change, out.put="marker.list")
+cell.change <- data.frame(start=c("FIB"), test=c("nESC"), target=c("ESC"))
+group.OnOff <- OnOff(sm1, cell.change, out.put="marker.list")
 ```

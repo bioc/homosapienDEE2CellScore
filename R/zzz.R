@@ -37,4 +37,18 @@
 #' @aliases HomosapienDEE2_QC_PASS_Deseq2
 #' @seealso readInSEZip
 #' @seealso downloadAllTheData
+#' @export HomosapienDEE2_QC_WARN_Raw
+#' @export HomosapienDEE2_QC_PASS_Raw
+#' @export HomosapienDEE2_QC_WARN_Rank
+#' @export HomosapienDEE2_QC_PASS_Rank
+#' @export HomosapienDEE2_QC_WARN_Agg
+#' @export HomosapienDEE2_QC_PASS_Agg
+#' @export HomosapienDEE2_QC_WARN_Deseq2
+#' @export HomosapienDEE2_QC_PASS_Deseq2
+#' @examples
+#' # The ExperimentHub metadata for the Deseq2 normalised data that passes QC is downloadable like so
+#' the_metadata <- HomosapienDEE2_QC_PASS_Deseq2(metadata=TRUE)
+#' 
+#' # Or to download all of the data for the Deseq2 normalised data that passes QC do the following
+#' #the_data <- HomosapienDEE2_QC_PASS_Deseq2()
 NULL

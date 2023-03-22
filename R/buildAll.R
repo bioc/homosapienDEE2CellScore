@@ -76,7 +76,6 @@ buildRaw <- function(species="hsapiens", accessions=unique(cols$SRR_accession), 
 #'
 #' # Get PCA form of the deseq2 normalised data that passed quality control
 #' pca_form <- prcomp(t(SummarizedExperiment::assay(processed_data$qc_pass_deseq2, "counts")))
-
 buildData <- function(species="hsapiens", name_prefix="homosapienDEE2Data", name_suffix=".csv", build_raw=FALSE, build_srx_agg=FALSE, build_deseq2=TRUE, build_tsne=TRUE, build_rank=TRUE, generate_qc_pass = TRUE, generate_qc_warn = TRUE, base=getwd(), quiet=TRUE, metadata=if(!(build_raw || build_srx_agg || build_deseq2 || build_tsne || build_rank) || !(generate_qc_pass || generate_qc_warn)) { return(list()); } else { getDEE2Metadata(species, quiet=quiet) }, counts.cutoff = 10, accessions=as.list(unique(cols$SRR_accession)), in_data = if(!(build_raw || build_srx_agg || build_deseq2 || build_tsne || build_rank) || !(generate_qc_pass || generate_qc_warn)) { return(list()); } else { buildRaw(species=species, accessions=accessions, quiet=quiet, metadata=metadata) }, dds_design = ~ 1, write_files = TRUE) {
 
   out <- list()
@@ -304,7 +303,6 @@ readInSE <- function(metadata_file="SE_out_metadata.csv", assay_counts_file="SE_
 #' @examples
 #' # We can read in a small SummarizedExperiment containing a subset of the built data stored directly in the package like so
 #' small_data <- readInSEZip(system.file("ASmallSummarizedExperiment.zip", package="homosapienDEE2CellScore"))
-
 readInSEZip <- function(zip_name="SE_out.zip") {
   x <- tempdir()
   y <- tempfile()
@@ -352,11 +350,11 @@ readInSEFolder <- function(folder_name="SE_out/") {
 #' @import SummarizedExperiment
 #' @importClassesFrom SummarizedExperiment SummarizedExperiment
 #' @importFrom SummarizedExperiment assay colData rowData as.data.frame
+#' @examples
 #' # This is a small SummarizedExperiment containing some un-aggregated data
 #' small_data <- readInSEZip(system.file("ASmallSummarizedExperiment.zip", package="homosapienDEE2CellScore"))
 #' # We can aggregate it like so:
 #' aggregated_small_data <- srx_agg_se(small_data)
-
 srx_agg_se <- function(x,counts="GeneCounts") {
     mds<-colData(x)
     base<-SummarizedExperiment::assay(x, "counts")

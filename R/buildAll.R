@@ -1,8 +1,12 @@
 
 #' hsapiens column data we are targetting
 #'
-#' Notably the accession are in cols$SRR_accession
+#' A dataframe containing metadata for the dataset we are processing; notably the accessions (which tell us the specific chunks of data to download from dee2.io) are in cols$SRR_accession
 #' @export
+#' @examples
+#' # We can use this for looking up metadata based on other metadata
+#' # For instance, to get all the accessions for liver cells in the dataset we are analysing, run
+#' liver_cell_accessions <- homosapienDEE2CellScore::cols$SRR_accession[homosapienDEE2CellScore::cols$cell_type == "liver"]
 cols <- DataFrame(read.csv(system.file("hsapiens_colData_transitions_v3.5.csv", package="homosapienDEE2CellScore")))
 
 #' buildRaw gets the raw data in SummarizedExperiment format
@@ -27,7 +31,7 @@ buildRaw <- function(species="hsapiens", accessions=unique(cols$SRR_accession), 
 #' This function generates the data set for this package.
 #' All parameters are optional; by default the function will
 #' generate a normalised dataset based on downloading
-#' the accessions in `inst/hsapiens_colData.csv` for species "hsapiens",
+#' the accessions in `inst/hsapiens_colData_transitions_v3.5.csv` for species "hsapiens",
 #' and save the dataset to a file called `homosapienDEE2Data.rds` in the current directory.
 #'
 #' @param species          The species to fetch data for; default is "hsapiens".
@@ -297,6 +301,9 @@ readInSE <- function(metadata_file="SE_out_metadata.csv", assay_counts_file="SE_
 #' @importClassesFrom SummarizedExperiment SummarizedExperiment
 #' @importFrom SummarizedExperiment assay colData rowData as.data.frame
 #' @importFrom utils read.csv unzip
+#' @examples
+#' # We can read in a small SummarizedExperiment containing a subset of the built data stored directly in the package like so
+#' small_data <- readInSEZip(system.file("ASmallSummarizedExperiment.zip", package="homosapienDEE2CellScore"))
 
 readInSEZip <- function(zip_name="SE_out.zip") {
   x <- tempdir()
@@ -345,6 +352,10 @@ readInSEFolder <- function(folder_name="SE_out/") {
 #' @import SummarizedExperiment
 #' @importClassesFrom SummarizedExperiment SummarizedExperiment
 #' @importFrom SummarizedExperiment assay colData rowData as.data.frame
+#' # This is a small SummarizedExperiment containing some un-aggregated data
+#' small_data <- readInSEZip(system.file("ASmallSummarizedExperiment.zip", package="homosapienDEE2CellScore"))
+#' # We can aggregate it like so:
+#' aggregated_small_data <- srx_agg_se(small_data)
 
 srx_agg_se <- function(x,counts="GeneCounts") {
     mds<-colData(x)
@@ -402,6 +413,10 @@ addProbeId <- function(summarized_experiment) {
 #'
 #'
 #' @export
+#' @examples
+#' # To download all of the preprocessed data from figshare via ExperimentHub, run:
+#'
+#' #the_data <- homosapienDEE2CellScore::downloadAllTheData()
 downloadAllTheData <- function() {
   return(list(
     HomosapienDEE2_QC_PASS_Agg=homosapienDEE2CellScore::readInSEZip(homosapienDEE2CellScore::HomosapienDEE2_QC_PASS_Agg()),

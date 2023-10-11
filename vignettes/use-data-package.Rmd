@@ -13,22 +13,40 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
+This data package contains code to generate various filtered forms of a normalised dataset based on downloading the accessions in `inst/hsapiens_colData_transitions_v3.5.csv` for species "hsapiens" from [DEE2](DEE2.io), and it also has a way (for reproducibility and also ease of use) to use AnnotationHub (as the data files were too large to fit inside of the data package itself) to fetch data pregenerated at the initial package development time.
+
+In order to prepare for downloading the data, you will need the following setup:
 
 ```{r setup}
 library(DESeq2)
+library(S4Vectors)
 library(Biobase)
 library(SummarizedExperiment)
 library(getDEE2)
 library(devtools)
 library(CellScore)
 library(homosapienDEE2CellScore)
+```
+
+All of the permutations of filtering and normalising the data can be downloaded in a labeled list like so:
+
+```{r}
 the_data<-downloadAllTheData()
+```
+
+We can then get the data we are after - non-normalised data including samples with quality control warnings - and use it in CellScore to calculate the on/off score for cell transitions from fibroblast to embryonic stem cells:
+
+```{r}
+sm <- the_data$HomosapienDEE2_QC_WARN_Raw
+## We could have just run `sm <- homosapienDEE2CellScore::readInSEZip(homosapienDEE2CellScore::HomosapienDEE2_QC_PASS_Raw())`
+## instead of downloading all the data.
+
 # Here we want to analyse all of the raw data to calculate the
 # on/off score for cell transitions from fibroblast to embryonic stem cells
-sm <- the_data$HomosapienDEE2_QC_WARN_Raw
 test1 <- sm[, sm$category == 'test']
 standard <- sm[, sm$category == 'standard']
 sm1 <- cbind(test1, standard)
 cell.change <- data.frame(start=c("FIB"), test=c("nESC"), target=c("ESC"))
 group.OnOff <- OnOff(sm1, cell.change, out.put="marker.list")
 ```
+

@@ -75,6 +75,9 @@ buildData(
 
 \item{write_files}{Write out normalised data to files. If this is false, the function will not write out the normalised data, but will only return it.}
 }
+\value{
+A named list with
+}
 \description{
 This function generates the data set for this package.
 All parameters are optional; by default the function will

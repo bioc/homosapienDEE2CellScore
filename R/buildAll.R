@@ -17,6 +17,7 @@ cols <- DataFrame(read.csv(system.file("hsapiens_colData_transitions_v3.5.csv", 
 #' @param quiet            Whether to suppress notification output where possible; default TRUE.
 #' @param metadata         If you have already downloaded metadata for the species, you can pass it in here. Otherwise the metadata will be downloaded.
 #' @param accessions       Which sample ids to download from DEE2 (we refer to these as accessions); default is derived from `hsapiens_colData.csv` in this package. For subsets, you can see the internal `cols` objects `SRR_accession` member.
+#' @returns Returns a SummarizedExperiment object containing raw data downloaded from dee2.
 #' @export
 #' @import SummarizedExperiment
 #' @importFrom getDEE2 getDEE2
@@ -54,6 +55,7 @@ buildRaw <- function(species="hsapiens", accessions=unique(cols$SRR_accession), 
 #' @param in_data          If you have already downloaded the accession data from DEE2, you can pass it through here. Otherwise this data will be downloaded.
 #' @param dds_design       The design formula used as part of DESeq2 normalisation. Default is `~ 1`. See the documentation for `DESeq2::DESeqDataSetFromMatrix` for more details.
 #' @param write_files      Write out normalised data to files. If this is false, the function will not write out the normalised data, but will only return it.
+#' @returns A named list with 
 #' @export
 #' @import SummarizedExperiment
 #' @importFrom getDEE2 getDEE2

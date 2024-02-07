@@ -27,6 +27,7 @@
 #'   \item HomosapienDEE2_QC_PASS_Deseq2 Deseq2 normalised data without any quality control warnings
 #' }
 #'
+#' @returns These functions return a path to the downloaded container file.
 #' @name HomosapienDEE2_QC_WARN_Raw
 #' @aliases HomosapienDEE2_QC_PASS_Raw
 #' @aliases HomosapienDEE2_QC_WARN_Rank

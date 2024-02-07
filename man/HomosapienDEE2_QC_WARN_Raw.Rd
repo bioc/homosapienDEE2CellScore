@@ -10,6 +10,9 @@
 \alias{HomosapienDEE2_QC_WARN_Deseq2}
 \alias{HomosapienDEE2_QC_PASS_Deseq2}
 \title{Automatically created ergonomic accessor functions}
+\value{
+These functions return a path to the downloaded container file.
+}
 \description{
 Accessor functions for retrieving the data associated with this
 data package from ExperimentHub. Each of these functions downloads the

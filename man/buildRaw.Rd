@@ -20,6 +20,9 @@ buildRaw(
 
 \item{metadata}{If you have already downloaded metadata for the species, you can pass it in here. Otherwise the metadata will be downloaded.}
 }
+\value{
+Returns a SummarizedExperiment object containing raw data downloaded from dee2.
+}
 \description{
 This function gets the raw Data from dee2 and packages it in a SummarizedExperiment
 }

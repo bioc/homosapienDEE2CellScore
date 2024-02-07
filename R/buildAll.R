@@ -254,6 +254,7 @@ writeOutSE <- function(
 #' @param filename_ext               The default extension to use for each of the generated files within the zip file
 #' @param filenames                  A tagged list of filenames for the files inside the zip file: `metadata`, `assay_counts`, `assay_calls`, `colData`, `rowData`.
 #' @param zip_name                   The name of the generated zip file.
+#' @returns The status value returned by the external command invoked to create the zip file, invisibly.
 #' @export
 #' @import SummarizedExperiment
 #' @importClassesFrom SummarizedExperiment SummarizedExperiment

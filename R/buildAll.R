@@ -55,7 +55,8 @@ buildRaw <- function(species="hsapiens", accessions=unique(cols$SRR_accession), 
 #' @param in_data          If you have already downloaded the accession data from DEE2, you can pass it through here. Otherwise this data will be downloaded.
 #' @param dds_design       The design formula used as part of DESeq2 normalisation. Default is `~ 1`. See the documentation for `DESeq2::DESeqDataSetFromMatrix` for more details.
 #' @param write_files      Write out normalised data to files. If this is false, the function will not write out the normalised data, but will only return it.
-#' @returns A named list with 
+#' @returns A named list of SummarizedExperiment objects. The exact set depends on the options you select when calling the function.
+#' @seealso downloadAllTheData
 #' @export
 #' @import SummarizedExperiment
 #' @importFrom getDEE2 getDEE2

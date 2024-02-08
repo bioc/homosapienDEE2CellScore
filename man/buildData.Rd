@@ -76,7 +76,7 @@ buildData(
 \item{write_files}{Write out normalised data to files. If this is false, the function will not write out the normalised data, but will only return it.}
 }
 \value{
-A named list with
+A named list of SummarizedExperiment objects. The exact set depends on the options you select when calling the function.
 }
 \description{
 This function generates the data set for this package.
@@ -98,4 +98,7 @@ processed_data <- homosapienDEE2CellScore::buildData(metadata=metadata, accessio
 
 # Get PCA form of the deseq2 normalised data that passed quality control
 pca_form <- prcomp(t(SummarizedExperiment::assay(processed_data$qc_pass_deseq2, "counts")))
+}
+\seealso{
+downloadAllTheData
 }

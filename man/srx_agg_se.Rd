@@ -11,6 +11,9 @@ srx_agg_se(x, counts = "GeneCounts")
 
 \item{counts}{What kind of count; "GeneCounts" for STAR based gene counts, "TxCounts" for kallisto transcript level counts or "Tx2Gene" for transcript counts aggregated to gene level. Default is "GeneCounts"}
 }
+\value{
+A SummarizedExperiment object, with runs representing the same SRA experiment aggregated, and with coldata grouped by SRA experiment.
+}
 \description{
 This function aggregates runs that represent the same SRA experiment, and reorganises
 the coldata in the SummarizedExperiment to to be grouped by SRA experiment in order to

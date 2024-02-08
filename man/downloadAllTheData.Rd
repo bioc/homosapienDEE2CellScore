@@ -6,6 +6,20 @@
 \usage{
 downloadAllTheData()
 }
+\value{
+A named list of SummarizedExperiment objects.
+The names correspond to the kinds of filtering and processing that object has undergone. The names and what they correspond to are:
+\itemize{
+  \item HomosapienDEE2_QC_WARN_Raw    Raw data including data that has quality control warnings
+  \item HomosapienDEE2_QC_PASS_Raw    Raw data without any quality control warnings
+  \item HomosapienDEE2_QC_WARN_Rank   Rank normalised data including data that has quality control warnings
+  \item HomosapienDEE2_QC_PASS_Rank   Rank normalised data without any quality control warnings
+  \item HomosapienDEE2_QC_WARN_Agg    Aggregated data including data that has quality control warnings
+  \item HomosapienDEE2_QC_PASS_Agg    Aggregated data without any quality control warnings
+  \item HomosapienDEE2_QC_WARN_Deseq2 Deseq2 normalised data that has quality control warnings
+  \item HomosapienDEE2_QC_PASS_Deseq2 Deseq2 normalised data without any quality control warnings
+}
+}
 \description{
 This is a helper function to download all of the processed data from figshare and unpack it into a tagged list of SummarizedExperiment objects.
 }

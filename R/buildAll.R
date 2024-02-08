@@ -304,6 +304,7 @@ readInSE <- function(metadata_file="SE_out_metadata.csv", assay_counts_file="SE_
 #' so it extracts the intermediate csvs into a temporary folder to get the data into the datastructure.
 #'
 #' @param zip_name  The path to a zip file containing a SummarizedExperiment
+#' @returns A SummarizedExperiment object.
 #' @export
 #' @import SummarizedExperiment
 #' @importClassesFrom SummarizedExperiment SummarizedExperiment
@@ -332,6 +333,7 @@ readInSEZip <- function(zip_name="SE_out.zip") {
 #' so it does not clean up after itself and leaves stray csv files in the data package directory.
 #'
 #' @param folder_name  The path to a folder containing a SummarizedExperiment
+#' @returns A SummarizedExperiment object.
 #' @import SummarizedExperiment
 #' @importClassesFrom SummarizedExperiment SummarizedExperiment
 #' @importFrom SummarizedExperiment assay colData rowData as.data.frame
@@ -353,6 +355,7 @@ readInSEFolder <- function(folder_name="SE_out/") {
 #'
 #' @param x          A SummarizedExperiment.
 #' @param counts     What kind of count; "GeneCounts" for STAR based gene counts, "TxCounts" for kallisto transcript level counts or "Tx2Gene" for transcript counts aggregated to gene level. Default is "GeneCounts"
+#' @returns A SummarizedExperiment object, with runs representing the same SRA experiment aggregated, and with coldata grouped by SRA experiment.
 #' @export
 #' @import SummarizedExperiment
 #' @importClassesFrom SummarizedExperiment SummarizedExperiment
@@ -417,6 +420,20 @@ addProbeId <- function(summarized_experiment) {
 #' This is a helper function to download all of the processed data from figshare and unpack it into a tagged list of SummarizedExperiment objects.
 #'
 #'
+#' @returns
+#' A named list of SummarizedExperiment objects.
+#' The names correspond to the kinds of filtering and processing that object has undergone. The names and what they correspond to are:
+#' \itemize{
+#'   \item HomosapienDEE2_QC_WARN_Raw    Raw data including data that has quality control warnings
+#'   \item HomosapienDEE2_QC_PASS_Raw    Raw data without any quality control warnings
+#'   \item HomosapienDEE2_QC_WARN_Rank   Rank normalised data including data that has quality control warnings
+#'   \item HomosapienDEE2_QC_PASS_Rank   Rank normalised data without any quality control warnings
+#'   \item HomosapienDEE2_QC_WARN_Agg    Aggregated data including data that has quality control warnings
+#'   \item HomosapienDEE2_QC_PASS_Agg    Aggregated data without any quality control warnings
+#'   \item HomosapienDEE2_QC_WARN_Deseq2 Deseq2 normalised data that has quality control warnings
+#'   \item HomosapienDEE2_QC_PASS_Deseq2 Deseq2 normalised data without any quality control warnings
+#' }
+#' 
 #' @export
 #' @examples
 #' # To download all of the preprocessed data from figshare via ExperimentHub, run:

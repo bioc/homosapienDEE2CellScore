@@ -339,6 +339,9 @@ readInSEZip <- function(zip_name="SE_out.zip") {
 #' @importClassesFrom SummarizedExperiment SummarizedExperiment
 #' @importFrom SummarizedExperiment assay colData rowData as.data.frame
 #' @importFrom utils read.csv
+#' @examples
+#' # We can read in a small SummarizedExperiment containing a subset of the built data stored directly in the package like so
+#' small_data <- readInSEFolder(folder_name=system.file("ExampleSummarisedExperimentFolder", package="homosapienDEE2CellScore"))
 readInSEFolder <- function(folder_name="SE_out/") {
   z <- getwd()
   setwd(folder_name)

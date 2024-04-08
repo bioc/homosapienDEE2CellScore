@@ -72,3 +72,9 @@ cell.change <- data.frame(start=c("FIB"), test=c("nESC"), target=c("ESC"))
 group.OnOff <- OnOff(sm1, cell.change, out.put="marker.list")
 ```
 
+
+# Session Info
+
+```{r sessionInfo}
+sessionInfo()
+```

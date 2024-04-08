@@ -22,14 +22,14 @@ This data package contains code to generate various filtered forms of a normalis
 
 We assume you already have R installed and configured. If you do not have Bioconductor installed, you can install it like so:
 
-```{r install bioconductor, eval = false}
+```{r install bioconductor, eval = FALSE}
 if (!requireNamespace("BiocManager", quietly=TRUE))
     install.packages("BiocManager")
 BiocManager::install()
 ```
 
 Then, if you have not installed this package and the dependencies from Bioconductor, you can install them like so:
-```{r install packages from bioconductor, eval = false}
+```{r install packages from bioconductor, eval = FALSE}
 BiocManager::install(c("CellScore", "homosapienDEE2CellScore", "devtools", "getDEE2", "SummarizedExperiment"))
 ```
 

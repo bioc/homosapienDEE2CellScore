@@ -18,6 +18,8 @@ It is designed for getting an intact SummarizedExperiment out of ExperimentHub f
 so it extracts the intermediate csvs into a temporary folder to get the data into the datastructure.
 }
 \examples{
-# We can read in a small SummarizedExperiment containing a subset of the built data stored directly in the package like so
-small_data <- readInSEZip(system.file("ASmallSummarizedExperiment.zip", package="homosapienDEE2CellScore"))
+# We can read in a small SummarizedExperiment containing a
+# subset of the built data stored directly in the package like so
+small_data <- readInSEZip(
+  system.file("ASmallSummarizedExperiment.zip", package="homosapienDEE2CellScore"))
 }

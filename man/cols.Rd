@@ -16,6 +16,7 @@ A dataframe containing metadata for the dataset we are processing; notably the a
 \examples{
 # We can use this for looking up metadata based on other metadata
 # For instance, to get all the accessions for liver cells in the dataset we are analysing, run
-liver_cell_accessions <- homosapienDEE2CellScore::cols$SRR_accession[homosapienDEE2CellScore::cols$cell_type == "liver"]
+liver_cell_accessions <-
+  homosapienDEE2CellScore::cols$SRR_accession[homosapienDEE2CellScore::cols$cell_type == "liver"]
 }
 \keyword{datasets}

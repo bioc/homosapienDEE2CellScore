@@ -21,7 +21,8 @@ preserve necessary SummarizedExperiment internal invariants.
 }
 \examples{
 # This is a small SummarizedExperiment containing some un-aggregated data
-small_data <- readInSEZip(system.file("ASmallSummarizedExperiment.zip", package="homosapienDEE2CellScore"))
+small_data <- readInSEZip(
+  system.file("ASmallSummarizedExperiment.zip", package="homosapienDEE2CellScore"))
 # We can aggregate it like so:
 aggregated_small_data <- srx_agg_se(small_data)
 }

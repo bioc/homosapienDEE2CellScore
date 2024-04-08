@@ -89,12 +89,17 @@ and save the dataset to a file called `homosapienDEE2Data.rds` in the current di
 # To build the default, full dataset, and write it out to several csv files:
 #homosapienDEE2CellScore::buildData()
 
-# To build a restricted set of data, with a cached metadata file, only running deseq2 normalisation, to "data_PASS_deseq2.csv" and "data_WARN_deseq2.csv"
+# To build a restricted set of data, with a cached metadata file,
+# only running deseq2 normalisation, to "data_PASS_deseq2.csv" and "data_WARN_deseq2.csv"
 metadata <- getDEE2::getDEE2Metadata("hsapiens", quiet=TRUE)
-homosapienDEE2CellScore::buildData(metadata=metadata, accessions=as.list(unique(cols$SRR_accession)[c(1,3)]), build_deseq2=TRUE, build_tsne=FALSE, build_rank=FALSE, name_prefix="data")
+homosapienDEE2CellScore::buildData(
+  metadata=metadata, accessions=as.list(unique(cols$SRR_accession)[c(1,3)]),
+  build_deseq2=TRUE, build_tsne=FALSE, build_rank=FALSE, name_prefix="data")
 
 # Process a subset of the data, but do not write it out into files
-processed_data <- homosapienDEE2CellScore::buildData(metadata=metadata, accessions=as.list(unique(cols$SRR_accession)[c(1,3)]), build_deseq2=TRUE, build_tsne=FALSE, write_files=FALSE)
+processed_data <- homosapienDEE2CellScore::buildData(
+  metadata=metadata, accessions=as.list(unique(cols$SRR_accession)[c(1,3)]),
+  build_deseq2=TRUE, build_tsne=FALSE, write_files=FALSE)
 
 # Get PCA form of the deseq2 normalised data that passed quality control
 pca_form <- prcomp(t(SummarizedExperiment::assay(processed_data$qc_pass_deseq2, "counts")))

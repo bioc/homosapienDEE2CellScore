@@ -13,9 +13,29 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
+
+# Introduction
+
 This data package contains code to generate various filtered forms of a normalised dataset based on downloading the accessions in `inst/hsapiens_colData_transitions_v3.5.csv` for species "hsapiens" from [DEE2](DEE2.io), and it also has a way (for reproducibility and also ease of use) to use AnnotationHub (as the data files were too large to fit inside of the data package itself) to fetch data pregenerated at the initial package development time.
 
-In order to prepare for downloading the data, you will need the following setup:
+# Installation
+
+We assume you already have R installed and configured. If you do not have Bioconductor installed, you can install it like so:
+
+```{r install, eval = false}
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
+BiocManager::install()
+```
+
+Then, if you have not installed this package and the dependencies from Bioconductor, you can install them like so:
+```{r install, eval = false}
+BiocManager::install(c("CellScore", "homosapienDEE2CellScore", "devtools", "getDEE2", "SummarizedExperiment"))
+```
+
+# Setup
+
+In order to make the needed libraries accessible, you will need the following setup:
 
 ```{r setup}
 library(DESeq2)
@@ -27,6 +47,8 @@ library(devtools)
 library(CellScore)
 library(homosapienDEE2CellScore)
 ```
+
+# Getting and using the data
 
 All of the permutations of filtering and normalising the data can be downloaded in a labeled list like so:
 

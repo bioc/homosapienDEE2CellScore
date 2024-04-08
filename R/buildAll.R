@@ -343,6 +343,7 @@ readInSEZip <- function(zip_name="SE_out.zip") {
 #'
 #' @param folder_name  The path to a folder containing a SummarizedExperiment
 #' @returns A SummarizedExperiment object.
+#' @export
 #' @import SummarizedExperiment
 #' @importClassesFrom SummarizedExperiment SummarizedExperiment
 #' @importFrom SummarizedExperiment assay colData rowData as.data.frame

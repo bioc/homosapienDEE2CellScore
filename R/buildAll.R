@@ -6,7 +6,8 @@
 #' @examples
 #' # We can use this for looking up metadata based on other metadata
 #' # For instance, to get all the accessions for liver cells in the dataset we are analysing, run
-#' liver_cell_accessions <- homosapienDEE2CellScore::cols$SRR_accession[homosapienDEE2CellScore::cols$cell_type == "liver"]
+#' liver_cell_accessions <-
+#'   homosapienDEE2CellScore::cols$SRR_accession[homosapienDEE2CellScore::cols$cell_type == "liver"]
 cols <- DataFrame(read.csv(system.file("hsapiens_colData_transitions_v3.5.csv", package="homosapienDEE2CellScore")))
 
 #' buildRaw gets the raw data in SummarizedExperiment format
@@ -72,12 +73,17 @@ buildRaw <- function(species="hsapiens", accessions=unique(cols$SRR_accession), 
 #' # To build the default, full dataset, and write it out to several csv files:
 #' #homosapienDEE2CellScore::buildData()
 #'
-#' # To build a restricted set of data, with a cached metadata file, only running deseq2 normalisation, to "data_PASS_deseq2.csv" and "data_WARN_deseq2.csv"
+#' # To build a restricted set of data, with a cached metadata file,
+#' # only running deseq2 normalisation, to "data_PASS_deseq2.csv" and "data_WARN_deseq2.csv"
 #' metadata <- getDEE2::getDEE2Metadata("hsapiens", quiet=TRUE)
-#' homosapienDEE2CellScore::buildData(metadata=metadata, accessions=as.list(unique(cols$SRR_accession)[c(1,3)]), build_deseq2=TRUE, build_tsne=FALSE, build_rank=FALSE, name_prefix="data")
+#' homosapienDEE2CellScore::buildData(
+#'   metadata=metadata, accessions=as.list(unique(cols$SRR_accession)[c(1,3)]),
+#'   build_deseq2=TRUE, build_tsne=FALSE, build_rank=FALSE, name_prefix="data")
 #'
 #' # Process a subset of the data, but do not write it out into files
-#' processed_data <- homosapienDEE2CellScore::buildData(metadata=metadata, accessions=as.list(unique(cols$SRR_accession)[c(1,3)]), build_deseq2=TRUE, build_tsne=FALSE, write_files=FALSE)
+#' processed_data <- homosapienDEE2CellScore::buildData(
+#'   metadata=metadata, accessions=as.list(unique(cols$SRR_accession)[c(1,3)]),
+#'   build_deseq2=TRUE, build_tsne=FALSE, write_files=FALSE)
 #'
 #' # Get PCA form of the deseq2 normalised data that passed quality control
 #' pca_form <- prcomp(t(SummarizedExperiment::assay(processed_data$qc_pass_deseq2, "counts")))
@@ -312,8 +318,10 @@ readInSE <- function(metadata_file="SE_out_metadata.csv", assay_counts_file="SE_
 #' @importFrom SummarizedExperiment assay colData rowData as.data.frame
 #' @importFrom utils read.csv unzip
 #' @examples
-#' # We can read in a small SummarizedExperiment containing a subset of the built data stored directly in the package like so
-#' small_data <- readInSEZip(system.file("ASmallSummarizedExperiment.zip", package="homosapienDEE2CellScore"))
+#' # We can read in a small SummarizedExperiment containing a
+#' # subset of the built data stored directly in the package like so
+#' small_data <- readInSEZip(
+#'   system.file("ASmallSummarizedExperiment.zip", package="homosapienDEE2CellScore"))
 readInSEZip <- function(zip_name="SE_out.zip") {
   x <- tempdir()
   y <- tempfile()
@@ -340,8 +348,10 @@ readInSEZip <- function(zip_name="SE_out.zip") {
 #' @importFrom SummarizedExperiment assay colData rowData as.data.frame
 #' @importFrom utils read.csv
 #' @examples
-#' # We can read in a small SummarizedExperiment containing a subset of the built data stored directly in the package like so
-#' small_data <- readInSEFolder(folder_name=system.file("ExampleSummarisedExperimentFolder", package="homosapienDEE2CellScore"))
+#' # We can read in a small SummarizedExperiment containing a
+#' # subset of the built data stored directly in the package like so
+#' small_data <- readInSEFolder(
+#'   folder_name=system.file("ExampleSummarisedExperimentFolder", package="homosapienDEE2CellScore"))
 readInSEFolder <- function(folder_name="SE_out/") {
   z <- getwd()
   setwd(folder_name)
@@ -366,7 +376,8 @@ readInSEFolder <- function(folder_name="SE_out/") {
 #' @importFrom SummarizedExperiment assay colData rowData as.data.frame
 #' @examples
 #' # This is a small SummarizedExperiment containing some un-aggregated data
-#' small_data <- readInSEZip(system.file("ASmallSummarizedExperiment.zip", package="homosapienDEE2CellScore"))
+#' small_data <- readInSEZip(
+#'   system.file("ASmallSummarizedExperiment.zip", package="homosapienDEE2CellScore"))
 #' # We can aggregate it like so:
 #' aggregated_small_data <- srx_agg_se(small_data)
 srx_agg_se <- function(x,counts="GeneCounts") {

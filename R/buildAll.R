@@ -269,7 +269,10 @@ writeOutSE <- function(
 #' @importFrom utils write.csv zip
 #' @examples
 #' # First, we download a few accessions of interest into a SummarizedExperiment
-#' accessions_of_interest <- buildData(accessions=as.list(unique(cols$SRR_accession)[c(1,3)]), write_files=FALSE, build_raw=TRUE, build_deseq2=FALSE, build_tsne=FALSE, build_rank=FALSE, generate_qc_pass=FALSE)$qc_warn_raw
+#' accessions_of_interest <- buildData(
+#'   accessions=as.list(unique(cols$SRR_accession)[c(1,3)]), write_files=FALSE,
+#'   build_raw=TRUE, build_deseq2=FALSE, build_tsne=FALSE, build_rank=FALSE,
+#'   generate_qc_pass=FALSE)$qc_warn_raw
 #' # Then we write them out to a zip file for later
 #' writeOutSEZip(accessions_of_interest, filename_base="InterestingAccessionsForLater")
 writeOutSEZip <- function(

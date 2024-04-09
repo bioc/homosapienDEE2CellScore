@@ -387,7 +387,7 @@ readInSEFolder <- function(folder_name="SE_out/") {
 srx_agg_se <- function(x,counts="GeneCounts") {
     mds<-colData(x)
     base<-SummarizedExperiment::assay(x, "counts")
-    n=nrow(base)
+    n<-nrow(base)
     srx_es<-unique(mds[["SRX_accession"]])
     SRX_assay <- vapply(X=srx_es, function(srx) {
         srrs<-rownames(mds)[which(mds[["SRX_accession"]] %in% srx)]
